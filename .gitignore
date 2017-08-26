@@ -1,0 +1,7 @@
+*.pro
+*.pro.user
+.depend
+matrixlib
+script.txt
+obj/
+build/
