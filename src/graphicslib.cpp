@@ -17,6 +17,7 @@
 
 #include <graphicslib.hpp>
 #include <utils.hpp>
+#include <windmill.hpp>
 
 namespace graphicslib {
 
@@ -103,6 +104,7 @@ namespace graphicslib {
     }
 
 
+    /*
     Vertex vertices[] = {
         glm::vec3(-0.5f, 0.5f, 0.f),    glm::vec3(1.f, 0.f, 0.f),   glm::vec2(1.f, 1.f),
         glm::vec3(-0.5f, -0.5f, 0.f),   glm::vec3(0.f, 1.f, 0.f),   glm::vec2(0.f, 1.f),
@@ -116,10 +118,46 @@ namespace graphicslib {
         0, 2, 3 //triangle 2
     };
     unsigned nrOfIndices = sizeof(indices) / sizeof(GLuint);
+    */
 
 
     void Window::run(){
+
         //TODO create a function to draw some vertices
+        Vertex vertices[] = {
+            //central vertex
+            glm::vec3(0.f, 0.f, 0.f),    glm::vec3(1.f, 0.f, 0.f),   glm::vec2(1.f, 1.f),
+            //right
+            glm::vec3(0.25f, 0.f, 0.f),    glm::vec3(1.f, 0.f, 0.f),   glm::vec2(1.f, 1.f),
+            //top right
+            glm::vec3(0.25f, 0.25f, 0.f),    glm::vec3(1.f, 0.f, 0.f),   glm::vec2(1.f, 1.f),
+            //top
+            glm::vec3(0.f, 0.25f, 0.f),    glm::vec3(1.f, 0.f, 0.f),   glm::vec2(1.f, 1.f),
+            //top left
+            glm::vec3(-0.25f, 0.25f, 0.f),    glm::vec3(1.f, 0.f, 0.f),   glm::vec2(1.f, 1.f),
+            //left
+            glm::vec3(-0.25f, 0.f, 0.f),    glm::vec3(1.f, 0.f, 0.f),   glm::vec2(1.f, 1.f),
+            //bottom left
+            glm::vec3(-0.25f, -0.25f, 0.f),    glm::vec3(1.f, 0.f, 0.f),   glm::vec2(1.f, 1.f),
+            //bottom
+            glm::vec3(0.f, -0.25f, 0.f),    glm::vec3(1.f, 0.f, 0.f),   glm::vec2(1.f, 1.f),
+            //bottom right
+            glm::vec3(0.25f, -0.25f, 0.f),    glm::vec3(1.f, 0.f, 0.f),   glm::vec2(1.f, 1.f)
+        } ;
+        //nrOfVertices = sizeof(vertices) / sizeof(Vertex);
+        GLuint indices[] = {
+            //top triangle
+            0,2,3,
+            //left triangle
+            0,4,5,
+            //bottom triangle
+            0,6,7,
+            //right triangle
+            0,8,1
+        };
+
+        unsigned nrOfIndices = sizeof(indices) / sizeof(GLuint);
+
 
         //model
 
