@@ -8,8 +8,10 @@ string(REPLACE " " "_" ProjectId ${ProjectId})
 #project name:
 project(${ProjectId})
 
-#set(CMAKE_CXX_FLAGS "-g -Wall")
+set(CMAKE_CXX_FLAGS "-g -Wall -lGLEW -lglfw -lGL -lX11 -lXi -lXrandr -lXxf86vm -lXinerama -lXcursor -lrt -lm -pthread")
+#set(CMAKE_CXX_FLAGS "-g -Wall -lGLEW  -lGL -lX11 -lXi -lXrandr -lXxf86vm -lXinerama -lXcursor -lrt -lm -pthread")
 #find_package(GLUT)
+#find_package(GLM REQUIRED)
 #find_package(OpenGL)
 
 #add_definitions(-DDEF_RET_1)
@@ -19,7 +21,27 @@ set (VERSION_MINOR 0)
 set (VERSION_PATCH 0)
 set (VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
 
+#OpenGL settings:
+#----------------------------
+include(ExternalProject)
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/external")
+include( glfw )
+
+#find_package(GLEW REQUIRED)
+#if (GLEW_FOUND)
+#    include_directories(${GLEW_INCLUDE_DIRS})
+#    link_libraries(${GLEW_LIBRARIES})
+#endif()
+
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/external/glad" "external/glad")
+#add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/external/glew" "external/glew")
+#----------------------------
+
 include_directories(${PROJECT_SOURCE_DIR}/include) #is this line inherited by the subprojects?
+#include_directories(/usr/include/)
+include_directories(${PROJECT_SOURCE_DIR}/external/soil) #is this line inherited by the subprojects?
+
+#include_directories(${PROJECT_SOURCE_DIR}/external/glew/include/GL)
 #link_directories(${PROJECT_SOURCE_DIR}/external/lib)
 
 message("Binary Tree path: ${PROJECT_BINARY_DIR}")

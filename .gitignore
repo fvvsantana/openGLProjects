@@ -1,7 +1,5 @@
-*.pro
-*.pro.user
+windmill
+*.user
 .depend
-matrixlib
-script.txt
 obj/
 build/
