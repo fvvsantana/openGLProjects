@@ -1,6 +1,6 @@
 #include <graphicslib.hpp>
 #include <iostream>
-#define WINDOW_WIDTH 800
+#define WINDOW_WIDTH 600
 #define WINDOW_HEIGHT 600
 
 using namespace std;
