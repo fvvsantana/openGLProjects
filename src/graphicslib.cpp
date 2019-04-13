@@ -17,7 +17,6 @@
 
 #include <graphicslib.hpp>
 #include <utils.hpp>
-#include <windmill.hpp>
 
 namespace graphicslib {
 
