@@ -191,19 +191,6 @@ namespace graphicslib {
             glUseProgram(mCoreProgram);
 
 
-            /*
-            //update uniforms
-            glUniform1i(glGetUniformLocation(core_program, "texture0"), 0);
-            glUniform1i(glGetUniformLocation(core_program, "texture1"), 1);
-
-            //Activate texture
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, texture0);
-            glActiveTexture(GL_TEXTURE1);
-            glBindTexture(GL_TEXTURE_2D, texture1);
-            */
-
-
             //bind vertex array object
             glBindVertexArray(VAO);
 
@@ -217,10 +204,6 @@ namespace graphicslib {
 
             glBindVertexArray(0);
             glUseProgram(0);
-            /*
-            glActiveTexture(0);
-            glBindTexture(GL_TEXTURE_2D, 0);
-            */
         }
 
     }
