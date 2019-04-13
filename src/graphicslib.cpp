@@ -239,12 +239,17 @@ namespace graphicslib {
 
 
     bool Window::loadShaders(GLuint &program, char* vertexShaderFile, char* fragmentShaderFile){
+        //success of the function
         bool loadSuccess = true;
-        char infoLog[512];
+        //variables for error logging
+        int logLength = 512;
+        char infoLog[logLength];
+        //auxiliary variable
         GLint success;
 
-        std::string temp = "";
         std::string src = "";
+
+        //vertex shader
 
         //copy file content to outputString
         if(!utils::fileToString(vertexShaderFile, src)){
@@ -252,20 +257,23 @@ namespace graphicslib {
             loadSuccess = false;
         }
 
+
+        //compile vertexShader
         GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
         const GLchar* vertSrc = src.c_str();
         glShaderSource(vertexShader, 1, &vertSrc, NULL);
         glCompileShader(vertexShader);
 
+        //check success of shader compilation
         glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
         if(!success){
-            glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
+            glGetShaderInfoLog(vertexShader, logLength, NULL, infoLog);
             std::cerr << "ERROR::LOADSHADERS::COULD_NOT_COMPILE_VERTEX_SHADER" << std::endl;
             std::cerr << infoLog << std::endl;
             loadSuccess = false;
         }
 
-        temp = "";
+        //clear shader source code
         src.clear();
 
         //fragment shader
@@ -276,40 +284,41 @@ namespace graphicslib {
             loadSuccess = false;
         }
 
-
+        //compile fragment shader
         GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
         const GLchar* fragSrc = src.c_str();
         glShaderSource(fragmentShader, 1, &fragSrc, NULL);
         glCompileShader(fragmentShader);
 
+        //check success of shader compilation
         glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
         if(!success){
-        glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-        std::cerr << "ERROR::LOADSHADERS::COULD_NOT_COMPILE_FRAGMENT_SHADER" << std::endl;
-        std::cerr << infoLog << std::endl;
-        loadSuccess = false;
+            glGetShaderInfoLog(fragmentShader, logLength, NULL, infoLog);
+            std::cerr << "ERROR::LOADSHADERS::COULD_NOT_COMPILE_FRAGMENT_SHADER" << std::endl;
+            std::cerr << infoLog << std::endl;
+            loadSuccess = false;
         }
 
-        //Program
+        //link program
         program = glCreateProgram();
 
         glAttachShader(program, vertexShader);
         glAttachShader(program, fragmentShader);
-
-
         glLinkProgram(program);
 
+        //check success of program linking
         glGetProgramiv(program, GL_LINK_STATUS, &success);
         if(!success){
-        glGetProgramInfoLog(program, 512, NULL, infoLog);
-        std::cerr << "ERROR::LOADSHADERS::COULD_NOT_LINK_PROGRAM" << std::endl;
-        std::cerr << infoLog << std::endl;
-        loadSuccess = false;
+            glGetProgramInfoLog(program, logLength, NULL, infoLog);
+            std::cerr << "ERROR::LOADSHADERS::COULD_NOT_LINK_PROGRAM" << std::endl;
+            std::cerr << infoLog << std::endl;
+            loadSuccess = false;
         }
 
         //End
         //reset step
         glUseProgram(0);
+        //delete shaders
         glDeleteShader(vertexShader);
         glDeleteShader(fragmentShader);
 
