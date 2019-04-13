@@ -128,21 +128,21 @@ namespace graphicslib {
             //central vertex
             glm::vec3(0.f, 0.f, 0.f),    glm::vec3(1.f, 0.f, 0.f),   glm::vec2(1.f, 1.f),
             //right
-            glm::vec3(0.25f, 0.f, 0.f),    glm::vec3(1.f, 0.f, 0.f),   glm::vec2(1.f, 1.f),
+            glm::vec3(0.25f, 0.f, 0.f),    glm::vec3(0.f, 1.f, 0.f),   glm::vec2(1.f, 1.f),
             //top right
-            glm::vec3(0.25f, 0.25f, 0.f),    glm::vec3(1.f, 0.f, 0.f),   glm::vec2(1.f, 1.f),
+            glm::vec3(0.25f, 0.25f, 0.f),    glm::vec3(0.f, 0.f, 1.f),   glm::vec2(1.f, 1.f),
             //top
-            glm::vec3(0.f, 0.25f, 0.f),    glm::vec3(1.f, 0.f, 0.f),   glm::vec2(1.f, 1.f),
+            glm::vec3(0.f, 0.25f, 0.f),    glm::vec3(0.f, 1.f, 0.f),   glm::vec2(1.f, 1.f),
             //top left
-            glm::vec3(-0.25f, 0.25f, 0.f),    glm::vec3(1.f, 0.f, 0.f),   glm::vec2(1.f, 1.f),
+            glm::vec3(-0.25f, 0.25f, 0.f),    glm::vec3(0.f, 0.f, 1.f),   glm::vec2(1.f, 1.f),
             //left
-            glm::vec3(-0.25f, 0.f, 0.f),    glm::vec3(1.f, 0.f, 0.f),   glm::vec2(1.f, 1.f),
+            glm::vec3(-0.25f, 0.f, 0.f),    glm::vec3(0.f, 1.f, 0.f),   glm::vec2(1.f, 1.f),
             //bottom left
-            glm::vec3(-0.25f, -0.25f, 0.f),    glm::vec3(1.f, 0.f, 0.f),   glm::vec2(1.f, 1.f),
+            glm::vec3(-0.25f, -0.25f, 0.f),    glm::vec3(0.f, 0.f, 1.f),   glm::vec2(1.f, 1.f),
             //bottom
-            glm::vec3(0.f, -0.25f, 0.f),    glm::vec3(1.f, 0.f, 0.f),   glm::vec2(1.f, 1.f),
+            glm::vec3(0.f, -0.25f, 0.f),    glm::vec3(0.f, 1.f, 0.f),   glm::vec2(1.f, 1.f),
             //bottom right
-            glm::vec3(0.25f, -0.25f, 0.f),    glm::vec3(1.f, 0.f, 0.f),   glm::vec2(1.f, 1.f)
+            glm::vec3(0.25f, -0.25f, 0.f),    glm::vec3(0.f, 0.f, 1.f),   glm::vec2(1.f, 1.f)
         } ;
         //nrOfVertices = sizeof(vertices) / sizeof(Vertex);
         GLuint indices[] = {
