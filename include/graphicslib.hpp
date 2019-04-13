@@ -24,7 +24,8 @@ namespace graphicslib {
 
         //callback function to execute when the window is resized
         static void framebufferResizeCallback(GLFWwindow* window, int fbWidth, int fbHeight);
-        void updateInput(GLFWwindow* window);
+        void updateInput(GLFWwindow *window, glm::vec3 &position, glm::vec3 &rotation, glm::vec3 &scale,
+                         glm::vec3 &previousAngularVelocity, glm::vec3 &angularVelocity);
         bool loadShaders(GLuint &program, char* vertexShaderFile, char* fragmentShaderFile);
 
     public:
