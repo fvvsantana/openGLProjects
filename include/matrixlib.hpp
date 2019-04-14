@@ -37,11 +37,14 @@ namespace ml{
                 matrix(matrix&& m);
 
                 //constructor:
-                matrix(int rows, int cols);
+                matrix(int rows, int cols, bool identity = false);
 
                 //constructor, copy matrix:
                 template<class U> 
                     matrix(U** m, int rows, int cols);
+
+                //constructor using single value
+                matrix(T value, int rows, int cols);
 
                 //destructor:
                 ~matrix();

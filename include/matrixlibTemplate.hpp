@@ -37,7 +37,7 @@ namespace ml{
 
     //constructor:
     template<class T>
-        matrix<T> :: matrix(int rows, int cols){
+        matrix<T> :: matrix(int rows, int cols, bool identity){
             std::cout << "normal constructor called" << std::endl;
             this->rows = rows;
             this->cols = cols;
@@ -46,6 +46,16 @@ namespace ml{
                 ml_new(ptr, rows, cols);
             }catch( std::bad_alloc &ba ){
                 throw ba;
+            }
+            //fill matrix
+            if(identity){
+                int i, j;
+                for(i=0; i<rows; i++){
+                    for(j=0; j<cols; j++){
+                        ptr[i][j] = (i == j);
+                    }
+
+                }
             }
         }
 
@@ -63,6 +73,27 @@ namespace ml{
                 throw ba;
             }
         }
+
+    //constructor using single value
+    template<class T>
+        matrix<T> :: matrix(T value, int rows, int cols){
+            std::cout << "single value constructor called" << std::endl;
+            this->rows = rows;
+            this->cols = cols;
+            try{
+                //allocation:
+                ml_new(ptr, rows, cols);
+            }catch( std::bad_alloc &ba ){
+                throw ba;
+            }
+            //fill matrix
+            int i, j;
+            for(i=0; i<rows; i++){
+                for(j=0; j<cols; j++){
+                    ptr[i][j] = value;
+                }
+            }
+    }
 
     //destructor:
     template<class T> 
