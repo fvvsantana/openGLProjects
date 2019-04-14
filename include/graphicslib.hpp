@@ -7,6 +7,10 @@
 
 #include <glm/glm.hpp>
 
+namespace ml{
+    template<class T>
+        class matrix;
+}
 
 namespace graphicslib {
     struct Vertex {
@@ -24,8 +28,8 @@ namespace graphicslib {
 
         //callback function to execute when the window is resized
         static void framebufferResizeCallback(GLFWwindow* window, int fbWidth, int fbHeight);
-        void updateInput(GLFWwindow *window, glm::vec3 &position, glm::vec3 &rotation, glm::vec3 &scale,
-                         glm::vec3 &previousAngularVelocity, glm::vec3 &angularVelocity);
+        void updateInput(GLFWwindow *window, ml::matrix<float> &position, ml::matrix<float> &scale,
+                             float &previousAngularVelocity, float &angularVelocity);
         bool loadShaders(GLuint &program, char* vertexShaderFile, char* fragmentShaderFile);
 
     public:

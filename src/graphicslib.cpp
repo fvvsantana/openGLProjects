@@ -17,6 +17,7 @@
 
 #include <graphicslib.hpp>
 #include <utils.hpp>
+#include <matrixlib.hpp>
 
 namespace graphicslib {
 
@@ -212,7 +213,20 @@ namespace graphicslib {
         glBindVertexArray(0);
 
 
+        ml::matrix<float> position(0.f, 3, 1);
+        float angle = 0.f;
+        ml::matrix<float> scale(1.f, 3, 1);
 
+        float previousAngularVelocity = 0.f;
+        float angularVelocity = 0.f;
+
+        ml::matrix<float> modelMatrix(4, 4, true);
+        modelMatrix = utils::translate(modelMatrix, position);
+        modelMatrix = utils::rotateZ(modelMatrix, angle);
+        modelMatrix = utils::scale(modelMatrix, scale);
+
+
+        /*
         glm::vec3 position(0.f);
         glm::vec3 rotation(0.f);
         glm::vec3 scale(1.f);
@@ -226,10 +240,12 @@ namespace graphicslib {
         modelMatrix = glm::rotate(modelMatrix, glm::radians(rotation.y), glm::vec3(0.f, 1.f, 0.f));
         modelMatrix = glm::rotate(modelMatrix, glm::radians(rotation.z), glm::vec3(0.f, 0.f, 1.f));
         modelMatrix = glm::scale(modelMatrix, scale);
+        */
 
         glUseProgram(mCoreProgram);
 
-        glUniformMatrix4fv(glGetUniformLocation(mCoreProgram, "modelMatrix"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
+        //glUniformMatrix4fv(glGetUniformLocation(mCoreProgram, "modelMatrix"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
+        glUniformMatrix4fv(glGetUniformLocation(mCoreProgram, "modelMatrix"), 1, GL_FALSE, &(modelMatrix.getMatrix()[0][0]));
 
         glUseProgram(0);
 
@@ -239,7 +255,7 @@ namespace graphicslib {
             glfwPollEvents();
 
             //update
-            updateInput(mWindow, position, rotation, scale, previousAngularVelocity, angularVelocity);
+            updateInput(mWindow, position, scale, previousAngularVelocity, angularVelocity);
 
             //draw
             //clear
@@ -249,15 +265,23 @@ namespace graphicslib {
             //use a program
             glUseProgram(mCoreProgram);
 
-            rotation = rotation + angularVelocity;
+            angle += angularVelocity;
+            /*
             modelMatrix = glm::mat4(1.f);
             modelMatrix = glm::translate(modelMatrix, position);
             modelMatrix = glm::rotate(modelMatrix, glm::radians(rotation.x), glm::vec3(1.f, 0.f, 0.f));
             modelMatrix = glm::rotate(modelMatrix, glm::radians(rotation.y), glm::vec3(0.f, 1.f, 0.f));
             modelMatrix = glm::rotate(modelMatrix, glm::radians(rotation.z), glm::vec3(0.f, 0.f, 1.f));
             modelMatrix = glm::scale(modelMatrix, scale);
+            */
 
-            glUniformMatrix4fv(glGetUniformLocation(mCoreProgram, "modelMatrix"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
+            modelMatrix = ml::matrix<float>(4, 4, true);
+            modelMatrix = utils::translate(modelMatrix, position);
+            modelMatrix = utils::rotateZ(modelMatrix, angle);
+            modelMatrix = utils::scale(modelMatrix, scale);
+
+            //glUniformMatrix4fv(glGetUniformLocation(mCoreProgram, "modelMatrix"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
+            glUniformMatrix4fv(glGetUniformLocation(mCoreProgram, "modelMatrix"), 1, GL_FALSE, &(modelMatrix.getMatrix()[0][0]));
 
 
             //bind vertex array object
@@ -283,33 +307,35 @@ namespace graphicslib {
     }
 
     //update the user input
-    void Window::updateInput(GLFWwindow *window, glm::vec3 &position, glm::vec3 &rotation, glm::vec3 &scale,
-                             glm::vec3 &previousAngularVelocity, glm::vec3 &angularVelocity){
+    //void Window::updateInput(GLFWwindow *window, glm::vec3 &position, glm::vec3 &rotation, glm::vec3 &scale,
+    //                         glm::vec3 &previousAngularVelocity, glm::vec3 &angularVelocity){
+    void Window::updateInput(GLFWwindow *window, ml::matrix<float> &position, ml::matrix<float> &scale,
+                             float &previousAngularVelocity, float &angularVelocity){
         if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS){
             glfwSetWindowShouldClose(window, GLFW_TRUE);
         }
         if(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS){
-            position.y += 0.01f;
+            position[1][0] += 0.01f;
         }
         if(glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS){
-            position.y -= 0.01f;
+            position[1][0] -= 0.01f;
         }
         if(glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS){
-            position.x += 0.01f;
+            position[0][0] += 0.01f;
         }
         if(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS){
-            position.x -= 0.01f;
+            position[0][0] -= 0.01f;
         }
         if(glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS){
-            angularVelocity.z += 0.1f;
+            angularVelocity += 0.01f;
         }
         if(glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS){
-            angularVelocity.z -= 0.1f;
+            angularVelocity -= 0.01f;
         }
         if(glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS){
-            if(angularVelocity.z != 0.f){
+            if(angularVelocity != 0.f){
                 previousAngularVelocity = angularVelocity;
-                angularVelocity.z = 0.f;
+                angularVelocity = 0.f;
             }else{
                 angularVelocity = previousAngularVelocity;
             }

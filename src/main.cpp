@@ -1,8 +1,7 @@
 #include <iostream>
 
-/*
+
 #include <graphicslib.hpp>
-*/
 #include <matrixlib.hpp>
 #include <utils.hpp>
 
@@ -54,13 +53,11 @@ int main(int argc, char const *argv[]) {
     //rotationTest();
 
 
-    /*
     graphicslib::Window window(WINDOW_WIDTH, WINDOW_HEIGHT);
     window.createWindow();
     window.run();
 
     cout << "oi gentee" << endl;
-    */
     /*
 
     ml::matrix<float> m3(1.f, ROWS, COLS);
