@@ -177,13 +177,16 @@ namespace ml{
         matrix<T> matrix<T> :: operator*(const matrix<T>& m) const{
             //alloc:
             try{
-                matrix<T> m3(rows, cols);
+                matrix<T> m3(rows, m.cols);
 
                 //multiplication:
-                int i, j;
-                for (i = 0; i < rows; i++) {
-                    for (j = 0; j < cols; j++) {
-                        m3.ptr[i][j] = ptr[i][j] * m.ptr[i][j];
+                int i, j, k;
+                for (i = 0; i < m3.rows; i++) {
+                    for (j = 0; j < m3.cols; j++) {
+                        m3.ptr[i][j] = 0;
+                        for(k = 0; k < cols; k++){
+                            m3.ptr[i][j] += ptr[i][k] * m.ptr[k][j];
+                        }
                     }
                 }
                 return m3;
