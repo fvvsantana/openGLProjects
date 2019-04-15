@@ -164,7 +164,8 @@ namespace graphicslib {
         //vertex array object
         GLuint VAO;
         //create a vertex arrays in the VAO
-        glCreateVertexArrays(1, &VAO);
+        //glCreateVertexArrays(1, &VAO);
+        glGenVertexArrays(1, &VAO);
         //bind the vertex array to use
         glBindVertexArray(VAO);
 
