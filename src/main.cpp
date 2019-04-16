@@ -11,7 +11,6 @@
 #define ROWS 2
 #define COLS 2
 
-using namespace std;
 
 void translationTest(){
     ml::matrix<float> position(1.f, 3, 1);
@@ -19,9 +18,9 @@ void translationTest(){
 
     ml::matrix<float> translationMatrix = utils::translate(identityMatrix, position);
 
-    cout << "position:" << endl << position << endl;
-    cout << "identity:" << endl << identityMatrix << endl;
-    cout << "translation matrix:" << endl << translationMatrix << endl;
+    std::cout << "position:" << std::endl << position << std::endl;
+    std::cout << "identity:" << std::endl << identityMatrix << std::endl;
+    std::cout << "translation matrix:" << std::endl << translationMatrix << std::endl;
 }
 
 void rotationTest(){
@@ -30,9 +29,9 @@ void rotationTest(){
 
     ml::matrix<float> rotationMatrix = utils::rotateZ(identityMatrix, angle);
 
-    cout << "angle:" << endl << angle << endl;
-    cout << "identity:" << endl << identityMatrix << endl;
-    cout << "rotation matrix:" << endl << rotationMatrix << endl;
+    std::cout << "angle:" << std::endl << angle << std::endl;
+    std::cout << "identity:" << std::endl << identityMatrix << std::endl;
+    std::cout << "rotation matrix:" << std::endl << rotationMatrix << std::endl;
 }
 
 void scaleTest(){
@@ -41,9 +40,9 @@ void scaleTest(){
 
     ml::matrix<float> scaleMatrix = utils::scale(identityMatrix, scale);
 
-    cout << "scale:" << endl << scale << endl;
-    cout << "identity:" << endl << identityMatrix << endl;
-    cout << "scale matrix:" << endl << scaleMatrix << endl;
+    std::cout << "scale:" << std::endl << scale << std::endl;
+    std::cout << "identity:" << std::endl << identityMatrix << std::endl;
+    std::cout << "scale matrix:" << std::endl << scaleMatrix << std::endl;
 }
 
 
@@ -57,7 +56,7 @@ int main(int argc, char const *argv[]) {
     window.createWindow();
     window.run();
 
-    cout << "oi gentee" << endl;
+    std::cout << "oi gentee" << std::endl;
     /*
 
     ml::matrix<float> m3(1.f, ROWS, COLS);
