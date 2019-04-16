@@ -1,5 +1,6 @@
 #ifndef MATRIXLIB_HPP
 #define MATRIXLIB_HPP
+#define MATRIXLIB_DEBUG 0
 
 #include <iostream>
 #include <string>

@@ -4,7 +4,9 @@ namespace ml{
     //copy constructor:
     template<class T> template<class U>
         matrix<T> :: matrix(const matrix<U>& m){
+#if MATRIXLIB_DEBUG
             std::cout << "copy constructor called" << std::endl;
+#endif
             rows = m.rows;
             cols = m.cols;
             try{
@@ -25,7 +27,9 @@ namespace ml{
     //move constructor:
     template<class T>
         matrix<T> :: matrix(matrix&& m){
+#if MATRIXLIB_DEBUG
             std::cout << "move constructor called" << std::endl;
+#endif
             //copy ints:
             rows = m.rows;
             cols = m.cols;
@@ -38,7 +42,9 @@ namespace ml{
     //constructor:
     template<class T>
         matrix<T> :: matrix(int rows, int cols, bool identity){
+#if MATRIXLIB_DEBUG
             std::cout << "normal constructor called" << std::endl;
+#endif
             this->rows = rows;
             this->cols = cols;
             try{
@@ -77,7 +83,9 @@ namespace ml{
     //constructor using single value
     template<class T>
         matrix<T> :: matrix(T value, int rows, int cols){
+#if MATRIXLIB_DEBUG
             std::cout << "single value constructor called" << std::endl;
+#endif
             this->rows = rows;
             this->cols = cols;
             try{
@@ -98,7 +106,9 @@ namespace ml{
     //destructor:
     template<class T> 
         matrix<T> :: ~matrix(){
+#if MATRIXLIB_DEBUG
             std::cout << "destructor called" << std::endl;
+#endif
             //deallocation:
             ml_delete(ptr);
         }
@@ -127,7 +137,9 @@ namespace ml{
     //copy assignment operator:
     template<class T> template<class U> 
         matrix<T>& matrix<T>::operator= (const matrix<U> &m ){
+#if MATRIXLIB_DEBUG
             std::cout << "copy assignment operator called" << std::endl;
+#endif
             //check for self-assignment:
             if(((void*)&m) == ((void*)this)){
                 return *this;
@@ -141,7 +153,9 @@ namespace ml{
     //move assignment operator:
     template<class T> template<class U> 
         matrix<T>& matrix<T>::operator= (matrix<U>&& m ){
+#if MATRIXLIB_DEBUG
             std::cout << "move assignment operator called" << std::endl;
+#endif
             //make a manual cast:
             copy(ptr, m.ptr, rows, cols);
 
@@ -151,7 +165,9 @@ namespace ml{
     //type-cast operator:
     template<class T> template<class U>
         matrix<T> :: operator matrix<U>(){
+#if MATRIXLIB_DEBUG
             std::cout << "type-cast operator called from " << typeid(T).name() << " to " << typeid(U).name() << std::endl;
+#endif
             try{
                 matrix<U> m(*this);
 
