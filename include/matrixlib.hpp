@@ -89,6 +89,8 @@ namespace ml{
                 friend std::ostream& operator<< <T>(std::ostream &output, const matrix &m);
                 //----------------------------
 
+                matrix<T> transpose() const;
+
         };
 
     //-----------------------------------------------------

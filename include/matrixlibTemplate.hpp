@@ -285,6 +285,27 @@ namespace ml{
         }
     //-----------------------------------------------------
 
+    //return a newly allocated transposed matrix
+    template<class T>
+        matrix<T> matrix<T> :: transpose() const{
+            //alloc:
+            try{
+                matrix<T> m(rows, cols);
+
+                //transposition:
+                int i, j;
+                for (i = 0; i < rows; i++) {
+                    for (j = 0; j < cols; j++) {
+                        m.ptr[j][i] = ptr[i][j];
+                    }
+                }
+                return m;
+            }catch( std::bad_alloc &ba ){
+                throw ba;
+            }
+        }
+
+
     //functions:
 
     //alloc a 2d-array:
@@ -334,4 +355,7 @@ namespace ml{
                 std::cout << std::string(eHeight, '\n');
             }
         }
+
+
+
 }
