@@ -32,6 +32,7 @@ namespace utils{
         return true;
     }
 
+    //apply a translation operation over the model matrix
     ml::matrix<float> translate(ml::matrix<float> &modelMatrix, ml::matrix<float> &position){
         int n = position.getRows() + 1;
         ml::matrix<float> translationMatrix(n, n, true);
