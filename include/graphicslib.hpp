@@ -25,6 +25,7 @@ namespace graphicslib {
         int mWindowHeight;
         GLFWwindow* mWindow;
         GLuint mCoreProgram;
+        bool spaceReleased;
 
         //callback function to execute when the window is resized
         static void framebufferResizeCallback(GLFWwindow* window, int fbWidth, int fbHeight);

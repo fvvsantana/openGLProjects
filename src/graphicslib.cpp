@@ -36,6 +36,7 @@ namespace graphicslib {
         mWindowHeight = windowHeight;
         mWindow = NULL;
         mCoreProgram = 0;
+        spaceReleased = true;
     }
 
     Window::~Window(){
@@ -334,13 +335,20 @@ namespace graphicslib {
             angularVelocity -= 0.01f;
         }
         if(glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS){
-            if(angularVelocity != 0.f){
-                previousAngularVelocity = angularVelocity;
-                angularVelocity = 0.f;
-            }else{
-                angularVelocity = previousAngularVelocity;
+            // update angularVelocity only if the user is not holding the space key
+            if(spaceReleased)
+            {
+                if(angularVelocity != 0.f){
+                    previousAngularVelocity = angularVelocity;
+                    angularVelocity = 0.f;
+                }else{
+                    angularVelocity = previousAngularVelocity;
+                }
             }
+            spaceReleased = false;
         }
+        if(glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_RELEASE)
+            spaceReleased = true;
     }
 
 
