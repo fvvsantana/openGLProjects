@@ -223,7 +223,7 @@ namespace graphicslib {
         ml::matrix<float> scale(1.f, 3, 1);
 
         float previousAngularVelocity = 0.f;
-        float angularVelocity = 0.f;
+        float angularVelocity = -0.01f;
 
         ml::matrix<float> modelMatrix(4, 4, true);
         modelMatrix = utils::translate(modelMatrix, position);
