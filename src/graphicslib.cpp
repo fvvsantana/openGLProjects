@@ -336,10 +336,10 @@ namespace graphicslib {
             position[0][0] -= 0.01f;
         }
         if(glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS){
-            angularVelocity += 0.01f;
+            angularVelocity += 0.001f;
         }
         if(glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS){
-            angularVelocity -= 0.01f;
+            angularVelocity -= 0.001f;
         }
         if(glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS){
             // update angularVelocity only if the user is not holding the space key
