@@ -14,7 +14,8 @@
 
 
 int main(int argc, char const *argv[]) {
-    tester::translationTest();
+    //tester::matrixOperationsTest();
+    //tester::translationTest();
     //tester::scaleTest();
     //tester::rotationTest();
 

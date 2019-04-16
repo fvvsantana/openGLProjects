@@ -226,6 +226,7 @@ namespace graphicslib {
         modelMatrix = utils::translate(modelMatrix, position);
         modelMatrix = utils::rotateZ(modelMatrix, angle);
         modelMatrix = utils::scale(modelMatrix, scale);
+        modelMatrix = modelMatrix.transpose();
 
 
         /*
@@ -277,13 +278,16 @@ namespace graphicslib {
             modelMatrix = glm::scale(modelMatrix, scale);
             */
 
+
             modelMatrix = ml::matrix<float>(4, 4, true);
             modelMatrix = utils::translate(modelMatrix, position);
             modelMatrix = utils::rotateZ(modelMatrix, angle);
             modelMatrix = utils::scale(modelMatrix, scale);
+            modelMatrix = modelMatrix.transpose();
 
             //glUniformMatrix4fv(glGetUniformLocation(mCoreProgram, "modelMatrix"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
-            glUniformMatrix4fv(glGetUniformLocation(mCoreProgram, "modelMatrix"), 1, GL_FALSE, &(modelMatrix.getMatrix()[0][0]));
+            //glUniformMatrix4fv(glGetUniformLocation(mCoreProgram, "modelMatrix"), 1, GL_FALSE, &(modelMatrix.getMatrix()[0][0]));
+            glUniformMatrix4fv(glGetUniformLocation(mCoreProgram, "modelMatrix"), 1, GL_FALSE, *(modelMatrix.getMatrix()));
 
 
             //bind vertex array object
