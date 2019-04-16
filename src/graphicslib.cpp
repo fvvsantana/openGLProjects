@@ -68,6 +68,9 @@ namespace graphicslib {
         //make context current
         glfwMakeContextCurrent(mWindow); //IMPORTANT!!
 
+        //enable vsync
+        glfwSwapInterval(1);
+
         //glad: load all OpenGL function pointers
         if(!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)){
             std::cerr << "Failed to initialize GLAD" << std::endl;
