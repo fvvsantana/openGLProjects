@@ -3,6 +3,23 @@
 
 namespace tester {
 
+    //do the same operations that are executed in the run function, but without transposition
+    void matrixOperationsTest(){
+        ml::matrix<float> position(3, 1);
+        position[0][0] = 1;
+        position[1][0] = 2;
+        position[2][0] = 3;
+        float angle = 3.1415/6.f;
+        ml::matrix<float> scale(1.f, 3, 1);
+
+        ml::matrix<float> modelMatrix(4, 4, true);
+        modelMatrix = utils::translate(modelMatrix, position);
+        modelMatrix = utils::rotateZ(modelMatrix, angle);
+        modelMatrix = utils::scale(modelMatrix, scale);
+
+        std::cout << "modelMatrix:\n" << modelMatrix << std::endl;
+    }
+
     void translationTest(){
         ml::matrix<float> position(3, 1);
         position[0][0] = 1;
