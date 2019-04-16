@@ -342,7 +342,8 @@ namespace graphicslib {
             angularVelocity -= 0.001f;
         }
         if(glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS){
-            // update angularVelocity only if the user is not holding the space key
+            // prevents this block to be executed simultaneously when
+            // the user holds the space key
             if(spaceReleased)
             {
                 if(angularVelocity != 0.f){
