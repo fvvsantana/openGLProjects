@@ -3,18 +3,6 @@
 #include <string>
 #include <vector>
 
-
-//#include <glm/vec2.hpp>
-//#include <glm/vec3.hpp>
-//#include <glm/vec4.hpp>
-//#include <glm/mat4x4.hpp>
-//#include <glm/gtc/matrix_transform.hpp>
-//#include <glm/gtc/type_ptr.hpp>
-//#include <SOIL/SOIL.h>
-//#include <../include/SOIL.h>
-//#include <../external/SOIL.h>
-
-
 #include <graphicslib.hpp>
 #include <utils.hpp>
 #include <matrixlib.hpp>
@@ -133,7 +121,7 @@ namespace graphicslib {
             //bottom right
             0.25f, -0.25f, 0.f,    0.f, 0.f, 1.f,   1.f, 1.f
         } ;
-        //nrOfVertices = sizeof(vertices) / sizeof(Vertex);
+        
         GLuint indices[] = {
             //top triangle
             0,2,3,
@@ -153,7 +141,6 @@ namespace graphicslib {
         //vertex array object
         GLuint VAO;
         //create a vertex arrays in the VAO
-        //glCreateVertexArrays(1, &VAO);
         glGenVertexArrays(1, &VAO);
         //bind the vertex array to use
         glBindVertexArray(VAO);
@@ -179,8 +166,6 @@ namespace graphicslib {
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
         //set vertexAttribPointers and enable (input assembly)
-        //position
-        //GLuint positionAttribLocation = glGetAttribLocation(core_program, "vertex_location");
         //define an array of generic vertex attribute data
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid *)offsetof(Vertex, position));
         //enable the created array
@@ -218,8 +203,6 @@ namespace graphicslib {
 
         glUseProgram(mCoreProgram);
 
-        //glUniformMatrix4fv(glGetUniformLocation(mCoreProgram, "modelMatrix"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
-        //glUniformMatrix4fv(glGetUniformLocation(mCoreProgram, "modelMatrix"), 1, GL_FALSE, &(modelMatrix.getMatrix()[0][0]));
         glUniformMatrix4fv(glGetUniformLocation(mCoreProgram, "modelMatrix"), 1, GL_FALSE, *(modelMatrix.getMatrix()));
 
         glUseProgram(0);
@@ -255,7 +238,6 @@ namespace graphicslib {
             glBindVertexArray(VAO);
 
             //draw
-            //glDrawArrays(GL_TRIANGLES, 0, nrOfVertices);
             glDrawElements(GL_TRIANGLES, nrOfIndices, GL_UNSIGNED_INT, 0);
 
             //end draw
