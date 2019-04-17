@@ -4,12 +4,12 @@
 #include <vector>
 
 
-//#include <glm/vec2.hpp>
-//#include <glm/vec3.hpp>
+#include <glm/vec2.hpp>
+#include <glm/vec3.hpp>
 //#include <glm/vec4.hpp>
 //#include <glm/mat4x4.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
+//#include <glm/gtc/matrix_transform.hpp>
+//#include <glm/gtc/type_ptr.hpp>
 //#include <SOIL/SOIL.h>
 //#include <../include/SOIL.h>
 //#include <../external/SOIL.h>
@@ -17,17 +17,19 @@
 
 #include <graphicslib.hpp>
 #include <utils.hpp>
+#include <matrixlib.hpp>
 
 namespace graphicslib {
 
+    //init glfw stuff
     Window::Window(int windowWidth, int windowHeight){
         //init glfw
         glfwInit();
 
         //set some window options
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
         glfwWindowHint(GLFW_RESIZABLE, GL_TRUE); //make window resizable
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); //compatibility to mac os users
 
@@ -35,10 +37,12 @@ namespace graphicslib {
         mWindowHeight = windowHeight;
         mWindow = NULL;
         mCoreProgram = 0;
+        spaceReleased = true;
     }
 
+    //destroy everything
     Window::~Window(){
-        //end of program
+        //destroy window
         if(mWindow){
             glfwDestroyWindow(mWindow);
         }
@@ -50,6 +54,7 @@ namespace graphicslib {
     }
 
 
+    //create the window, load glad, load shaders
     void Window::createWindow() {
         //create window
         mWindow = glfwCreateWindow(mWindowWidth, mWindowHeight, "WINDMILL", NULL, NULL);
@@ -65,6 +70,9 @@ namespace graphicslib {
 
         //make context current
         glfwMakeContextCurrent(mWindow); //IMPORTANT!!
+
+        //enable vsync
+        glfwSwapInterval(1);
 
         //glad: load all OpenGL function pointers
         if(!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)){
@@ -102,24 +110,7 @@ namespace graphicslib {
 
     }
 
-
-    /*
-    Vertex vertices[] = {
-        glm::vec3(-0.5f, 0.5f, 0.f),    glm::vec3(1.f, 0.f, 0.f),   glm::vec2(1.f, 1.f),
-        glm::vec3(-0.5f, -0.5f, 0.f),   glm::vec3(0.f, 1.f, 0.f),   glm::vec2(0.f, 1.f),
-        glm::vec3(0.5f, -0.5f, 0.f),    glm::vec3(0.f, 0.f, 1.f),   glm::vec2(0.f, 1.f),
-        glm::vec3(0.5f, 0.5f, 0.f),     glm::vec3(1.f, 1.f, 0.f),   glm::vec2(1.f, 1.f)
-    };
-    unsigned nrOfVertices = sizeof(vertices) / sizeof(Vertex);
-
-    GLuint indices[] = {
-        0, 1, 2, //triangle 1
-        0, 2, 3 //triangle 2
-    };
-    unsigned nrOfIndices = sizeof(indices) / sizeof(GLuint);
-    */
-
-
+    //main loop
     void Window::run(){
 
         //TODO create a function to draw some vertices
@@ -163,7 +154,8 @@ namespace graphicslib {
         //vertex array object
         GLuint VAO;
         //create a vertex arrays in the VAO
-        glCreateVertexArrays(1, &VAO);
+        //glCreateVertexArrays(1, &VAO);
+        glGenVertexArrays(1, &VAO);
         //bind the vertex array to use
         glBindVertexArray(VAO);
 
@@ -212,24 +204,24 @@ namespace graphicslib {
         glBindVertexArray(0);
 
 
+        ml::matrix<float> position(0.f, 3, 1);
+        float angle = 0.f;
+        ml::matrix<float> scale(1.f, 3, 1);
 
-        glm::vec3 position(0.f);
-        glm::vec3 rotation(0.f);
-        glm::vec3 scale(1.f);
+        float previousAngularVelocity = 0.f;
+        float angularVelocity = -0.01f;
 
-        glm::vec3 previousAngularVelocity(0.f);
-        glm::vec3 angularVelocity(0.f);
-
-        glm::mat4 modelMatrix(1.f);
-        modelMatrix = glm::translate(modelMatrix, position);
-        modelMatrix = glm::rotate(modelMatrix, glm::radians(rotation.x), glm::vec3(1.f, 0.f, 0.f));
-        modelMatrix = glm::rotate(modelMatrix, glm::radians(rotation.y), glm::vec3(0.f, 1.f, 0.f));
-        modelMatrix = glm::rotate(modelMatrix, glm::radians(rotation.z), glm::vec3(0.f, 0.f, 1.f));
-        modelMatrix = glm::scale(modelMatrix, scale);
+        ml::matrix<float> modelMatrix(4, 4, true);
+        modelMatrix = utils::translate(modelMatrix, position);
+        modelMatrix = utils::rotateZ(modelMatrix, angle);
+        modelMatrix = utils::scale(modelMatrix, scale);
+        modelMatrix = modelMatrix.transpose();
 
         glUseProgram(mCoreProgram);
 
-        glUniformMatrix4fv(glGetUniformLocation(mCoreProgram, "modelMatrix"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
+        //glUniformMatrix4fv(glGetUniformLocation(mCoreProgram, "modelMatrix"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
+        //glUniformMatrix4fv(glGetUniformLocation(mCoreProgram, "modelMatrix"), 1, GL_FALSE, &(modelMatrix.getMatrix()[0][0]));
+        glUniformMatrix4fv(glGetUniformLocation(mCoreProgram, "modelMatrix"), 1, GL_FALSE, *(modelMatrix.getMatrix()));
 
         glUseProgram(0);
 
@@ -239,7 +231,7 @@ namespace graphicslib {
             glfwPollEvents();
 
             //update
-            updateInput(mWindow, position, rotation, scale, previousAngularVelocity, angularVelocity);
+            updateInput(mWindow, position, scale, previousAngularVelocity, angularVelocity);
 
             //draw
             //clear
@@ -249,15 +241,15 @@ namespace graphicslib {
             //use a program
             glUseProgram(mCoreProgram);
 
-            rotation = rotation + angularVelocity;
-            modelMatrix = glm::mat4(1.f);
-            modelMatrix = glm::translate(modelMatrix, position);
-            modelMatrix = glm::rotate(modelMatrix, glm::radians(rotation.x), glm::vec3(1.f, 0.f, 0.f));
-            modelMatrix = glm::rotate(modelMatrix, glm::radians(rotation.y), glm::vec3(0.f, 1.f, 0.f));
-            modelMatrix = glm::rotate(modelMatrix, glm::radians(rotation.z), glm::vec3(0.f, 0.f, 1.f));
-            modelMatrix = glm::scale(modelMatrix, scale);
+            angle += angularVelocity;
 
-            glUniformMatrix4fv(glGetUniformLocation(mCoreProgram, "modelMatrix"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
+            modelMatrix = ml::matrix<float>(4, 4, true);
+            modelMatrix = utils::translate(modelMatrix, position);
+            modelMatrix = utils::rotateZ(modelMatrix, angle);
+            modelMatrix = utils::scale(modelMatrix, scale);
+            modelMatrix = modelMatrix.transpose();
+
+            glUniformMatrix4fv(glGetUniformLocation(mCoreProgram, "modelMatrix"), 1, GL_FALSE, *(modelMatrix.getMatrix()));
 
 
             //bind vertex array object
@@ -283,37 +275,45 @@ namespace graphicslib {
     }
 
     //update the user input
-    void Window::updateInput(GLFWwindow *window, glm::vec3 &position, glm::vec3 &rotation, glm::vec3 &scale,
-                             glm::vec3 &previousAngularVelocity, glm::vec3 &angularVelocity){
+    void Window::updateInput(GLFWwindow *window, ml::matrix<float> &position, ml::matrix<float> &scale,
+                             float &previousAngularVelocity, float &angularVelocity){
         if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS){
             glfwSetWindowShouldClose(window, GLFW_TRUE);
         }
         if(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS){
-            position.y += 0.01f;
+            position[1][0] += 0.01f;
         }
         if(glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS){
-            position.y -= 0.01f;
+            position[1][0] -= 0.01f;
         }
         if(glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS){
-            position.x += 0.01f;
+            position[0][0] += 0.01f;
         }
         if(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS){
-            position.x -= 0.01f;
+            position[0][0] -= 0.01f;
         }
         if(glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS){
-            angularVelocity.z += 0.1f;
+            angularVelocity += 0.001f;
         }
         if(glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS){
-            angularVelocity.z -= 0.1f;
+            angularVelocity -= 0.001f;
         }
         if(glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS){
-            if(angularVelocity.z != 0.f){
-                previousAngularVelocity = angularVelocity;
-                angularVelocity.z = 0.f;
-            }else{
-                angularVelocity = previousAngularVelocity;
+            // prevents this block to be executed simultaneously when
+            // the user holds the space key
+            if(spaceReleased)
+            {
+                if(angularVelocity != 0.f){
+                    previousAngularVelocity = angularVelocity;
+                    angularVelocity = 0.f;
+                }else{
+                    angularVelocity = previousAngularVelocity;
+                }
             }
+            spaceReleased = false;
         }
+        if(glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_RELEASE)
+            spaceReleased = true;
     }
 
 

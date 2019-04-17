@@ -29,6 +29,7 @@ add_library(${ProjectId}lib STATIC ${${ProjectId}_sources})
 #----------------------------
 #find_library(LIBGLEW GLEW ${CMAKE_SOURCE_DIR}/external)
 find_library(LIBSOIL SOIL ${CMAKE_SOURCE_DIR}/external/soil)
+#find_library(LIBGLM glm_static ${CMAKE_SOURCE_DIR}/external/)
 #target_link_libraries(${ProjectId}lib PUBLIC ${GLFW_LIBRARIES} glad glew)
 target_link_libraries(${ProjectId}lib PUBLIC ${GLFW_LIBRARIES} glad)
 target_include_directories(${ProjectId}lib PUBLIC ${GLFW_INCLUDE_DIR})
@@ -56,9 +57,20 @@ set_target_properties( ${ProjectId}lib PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${OBJ
 add_executable( ${EXECUTABLE} ${${ProjectId}_sources})
 #target_link_libraries(${EXECUTABLE} ${CMAKE_SOURCE_DIR}/external/glew-2.2.0/lib/libGLEW.a)
 #target_link_libraries(${EXECUTABLE} ${CMAKE_SOURCE_DIR}/external/libSOIL.a)
+#include(FindPkgConfig) # I think it's not necessary
+
+#glm linking
+find_package(glm REQUIRED)
+include_directories(${GLM_INCLUDE_DIR})
+target_link_libraries(${EXECUTABLE} ${GLM_LIBRARY})
+
+find_package(glfw REQUIRED)
+include_directories(${GLFW_INCLUDE_DIR})
+target_link_libraries(${EXECUTABLE} ${GLFW_LIBRARY})
+
+
 target_link_libraries(${EXECUTABLE} ${ProjectId}lib)
 target_link_libraries(${EXECUTABLE} ${LIBSOIL})
-#target_link_libraries(${EXECUTABLE} ${LIBGLEW})
 
 set_target_properties( ${EXECUTABLE} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
 #install(DIRECTORY ${CMAKE_SOURCE_DIR}/build/src/CMakeFiles/OBJECTS.dir

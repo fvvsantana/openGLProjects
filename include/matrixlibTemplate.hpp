@@ -4,7 +4,9 @@ namespace ml{
     //copy constructor:
     template<class T> template<class U>
         matrix<T> :: matrix(const matrix<U>& m){
+#if MATRIXLIB_DEBUG
             std::cout << "copy constructor called" << std::endl;
+#endif
             rows = m.rows;
             cols = m.cols;
             try{
@@ -25,7 +27,9 @@ namespace ml{
     //move constructor:
     template<class T>
         matrix<T> :: matrix(matrix&& m){
+#if MATRIXLIB_DEBUG
             std::cout << "move constructor called" << std::endl;
+#endif
             //copy ints:
             rows = m.rows;
             cols = m.cols;
@@ -37,8 +41,10 @@ namespace ml{
 
     //constructor:
     template<class T>
-        matrix<T> :: matrix(int rows, int cols){
+        matrix<T> :: matrix(int rows, int cols, bool identity){
+#if MATRIXLIB_DEBUG
             std::cout << "normal constructor called" << std::endl;
+#endif
             this->rows = rows;
             this->cols = cols;
             try{
@@ -46,6 +52,16 @@ namespace ml{
                 ml_new(ptr, rows, cols);
             }catch( std::bad_alloc &ba ){
                 throw ba;
+            }
+            //fill matrix
+            if(identity){
+                int i, j;
+                for(i=0; i<rows; i++){
+                    for(j=0; j<cols; j++){
+                        ptr[i][j] = (i == j);
+                    }
+
+                }
             }
         }
 
@@ -64,10 +80,35 @@ namespace ml{
             }
         }
 
+    //constructor using single value
+    template<class T>
+        matrix<T> :: matrix(T value, int rows, int cols){
+#if MATRIXLIB_DEBUG
+            std::cout << "single value constructor called" << std::endl;
+#endif
+            this->rows = rows;
+            this->cols = cols;
+            try{
+                //allocation:
+                ml_new(ptr, rows, cols);
+            }catch( std::bad_alloc &ba ){
+                throw ba;
+            }
+            //fill matrix
+            int i, j;
+            for(i=0; i<rows; i++){
+                for(j=0; j<cols; j++){
+                    ptr[i][j] = value;
+                }
+            }
+    }
+
     //destructor:
     template<class T> 
         matrix<T> :: ~matrix(){
+#if MATRIXLIB_DEBUG
             std::cout << "destructor called" << std::endl;
+#endif
             //deallocation:
             ml_delete(ptr);
         }
@@ -96,7 +137,9 @@ namespace ml{
     //copy assignment operator:
     template<class T> template<class U> 
         matrix<T>& matrix<T>::operator= (const matrix<U> &m ){
+#if MATRIXLIB_DEBUG
             std::cout << "copy assignment operator called" << std::endl;
+#endif
             //check for self-assignment:
             if(((void*)&m) == ((void*)this)){
                 return *this;
@@ -110,7 +153,9 @@ namespace ml{
     //move assignment operator:
     template<class T> template<class U> 
         matrix<T>& matrix<T>::operator= (matrix<U>&& m ){
+#if MATRIXLIB_DEBUG
             std::cout << "move assignment operator called" << std::endl;
+#endif
             //make a manual cast:
             copy(ptr, m.ptr, rows, cols);
 
@@ -120,7 +165,9 @@ namespace ml{
     //type-cast operator:
     template<class T> template<class U>
         matrix<T> :: operator matrix<U>(){
+#if MATRIXLIB_DEBUG
             std::cout << "type-cast operator called from " << typeid(T).name() << " to " << typeid(U).name() << std::endl;
+#endif
             try{
                 matrix<U> m(*this);
 
@@ -177,13 +224,16 @@ namespace ml{
         matrix<T> matrix<T> :: operator*(const matrix<T>& m) const{
             //alloc:
             try{
-                matrix<T> m3(rows, cols);
+                matrix<T> m3(rows, m.cols);
 
                 //multiplication:
-                int i, j;
-                for (i = 0; i < rows; i++) {
-                    for (j = 0; j < cols; j++) {
-                        m3.ptr[i][j] = ptr[i][j] * m.ptr[i][j];
+                int i, j, k;
+                for (i = 0; i < m3.rows; i++) {
+                    for (j = 0; j < m3.cols; j++) {
+                        m3.ptr[i][j] = 0;
+                        for(k = 0; k < cols; k++){
+                            m3.ptr[i][j] += ptr[i][k] * m.ptr[k][j];
+                        }
                     }
                 }
                 return m3;
@@ -235,6 +285,27 @@ namespace ml{
         }
     //-----------------------------------------------------
 
+    //return a newly allocated transposed matrix
+    template<class T>
+        matrix<T> matrix<T> :: transpose() const{
+            //alloc:
+            try{
+                matrix<T> m(rows, cols);
+
+                //transposition:
+                int i, j;
+                for (i = 0; i < rows; i++) {
+                    for (j = 0; j < cols; j++) {
+                        m.ptr[j][i] = ptr[i][j];
+                    }
+                }
+                return m;
+            }catch( std::bad_alloc &ba ){
+                throw ba;
+            }
+        }
+
+
     //functions:
 
     //alloc a 2d-array:
@@ -284,4 +355,7 @@ namespace ml{
                 std::cout << std::string(eHeight, '\n');
             }
         }
+
+
+
 }

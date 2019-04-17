@@ -5,8 +5,13 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include <glm/glm.hpp>
+#include <glm/vec3.hpp>
+#include <glm/vec2.hpp>
 
+namespace ml{
+    template<class T>
+        class matrix;
+}
 
 namespace graphicslib {
     struct Vertex {
@@ -21,26 +26,26 @@ namespace graphicslib {
         int mWindowHeight;
         GLFWwindow* mWindow;
         GLuint mCoreProgram;
+        bool spaceReleased;
 
         //callback function to execute when the window is resized
         static void framebufferResizeCallback(GLFWwindow* window, int fbWidth, int fbHeight);
-        void updateInput(GLFWwindow *window, glm::vec3 &position, glm::vec3 &rotation, glm::vec3 &scale,
-                         glm::vec3 &previousAngularVelocity, glm::vec3 &angularVelocity);
+        void updateInput(GLFWwindow *window, ml::matrix<float> &position, ml::matrix<float> &scale,
+                             float &previousAngularVelocity, float &angularVelocity);
         bool loadShaders(GLuint &program, char* vertexShaderFile, char* fragmentShaderFile);
 
     public:
 
-        //TODO refactor these comments
-        /// Instantiates glfw environment
+        //init glfw stuff
         Window(int windowWidth, int windowHeight);
 
-        /// Finalizes glfw environment
+        //destroy everything
         ~Window();
 
-        /// Create single window of 800x600 size
+        //create the window, load glad, load shaders
         void createWindow();
 
-        /// Run the application in a loop.
+        //main loop
         void run();
     };
 }

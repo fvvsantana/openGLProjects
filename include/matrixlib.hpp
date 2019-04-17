@@ -1,5 +1,6 @@
 #ifndef MATRIXLIB_HPP
 #define MATRIXLIB_HPP
+#define MATRIXLIB_DEBUG 0
 
 #include <iostream>
 #include <string>
@@ -37,11 +38,14 @@ namespace ml{
                 matrix(matrix&& m);
 
                 //constructor:
-                matrix(int rows, int cols);
+                matrix(int rows, int cols, bool identity = false);
 
                 //constructor, copy matrix:
                 template<class U> 
                     matrix(U** m, int rows, int cols);
+
+                //constructor using single value
+                matrix(T value, int rows, int cols);
 
                 //destructor:
                 ~matrix();
@@ -84,6 +88,8 @@ namespace ml{
                 //extraction operator:
                 friend std::ostream& operator<< <T>(std::ostream &output, const matrix &m);
                 //----------------------------
+
+                matrix<T> transpose() const;
 
         };
 
