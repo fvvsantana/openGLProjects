@@ -5,9 +5,6 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include <glm/vec3.hpp>
-#include <glm/vec2.hpp>
-
 namespace ml{
     template<class T>
         class matrix;
@@ -15,9 +12,9 @@ namespace ml{
 
 namespace graphicslib {
     struct Vertex {
-        glm::vec3 position;
-        glm::vec3 color;
-        glm::vec2 texcoord;
+        float position[3];
+        float color[3];
+        float texcoord[2];
     };
 
     class Window {
