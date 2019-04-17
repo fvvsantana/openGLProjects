@@ -203,12 +203,6 @@ namespace graphicslib {
         modelMatrix = utils::scale(modelMatrix, scale);
         modelMatrix = modelMatrix.transpose();
 
-        glUseProgram(mCoreProgram);
-
-        glUniformMatrix4fv(glGetUniformLocation(mCoreProgram, "modelMatrix"), 1, GL_FALSE, *(modelMatrix.getMatrix()));
-
-        glUseProgram(0);
-
 
         while(!glfwWindowShouldClose(mWindow)){
             //update input
