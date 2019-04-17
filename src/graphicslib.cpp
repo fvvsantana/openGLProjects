@@ -121,7 +121,7 @@ namespace graphicslib {
             //bottom right
             0.25f, -0.25f, 0.f,    0.f, 0.f, 1.f,   1.f, 1.f
         } ;
-        
+
         GLuint indices[] = {
             //top triangle
             0,2,3,
@@ -184,8 +184,10 @@ namespace graphicslib {
         //enable the created array
         glEnableVertexAttribArray(2);
 
-        //bind vao 0
+        //unbind the vertex array and all buffers
         glBindVertexArray(0);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 
         ml::matrix<float> position(0.f, 3, 1);
@@ -234,8 +236,9 @@ namespace graphicslib {
             glUniformMatrix4fv(glGetUniformLocation(mCoreProgram, "modelMatrix"), 1, GL_FALSE, *(modelMatrix.getMatrix()));
 
 
-            //bind vertex array object
+            //bind vertex array and element array objects
             glBindVertexArray(VAO);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 
             //draw
             glDrawElements(GL_TRIANGLES, nrOfIndices, GL_UNSIGNED_INT, 0);
@@ -245,6 +248,7 @@ namespace graphicslib {
             glFlush();
 
             glBindVertexArray(0);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
             glUseProgram(0);
         }
 
