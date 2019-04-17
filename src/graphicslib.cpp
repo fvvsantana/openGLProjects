@@ -21,6 +21,7 @@
 
 namespace graphicslib {
 
+    //init glfw stuff
     Window::Window(int windowWidth, int windowHeight){
         //init glfw
         glfwInit();
@@ -39,8 +40,9 @@ namespace graphicslib {
         spaceReleased = true;
     }
 
+    //destroy everything
     Window::~Window(){
-        //end of program
+        //destroy window
         if(mWindow){
             glfwDestroyWindow(mWindow);
         }
@@ -52,6 +54,7 @@ namespace graphicslib {
     }
 
 
+    //create the window, load glad, load shaders
     void Window::createWindow() {
         //create window
         mWindow = glfwCreateWindow(mWindowWidth, mWindowHeight, "WINDMILL", NULL, NULL);
@@ -107,24 +110,7 @@ namespace graphicslib {
 
     }
 
-
-    /*
-    Vertex vertices[] = {
-        glm::vec3(-0.5f, 0.5f, 0.f),    glm::vec3(1.f, 0.f, 0.f),   glm::vec2(1.f, 1.f),
-        glm::vec3(-0.5f, -0.5f, 0.f),   glm::vec3(0.f, 1.f, 0.f),   glm::vec2(0.f, 1.f),
-        glm::vec3(0.5f, -0.5f, 0.f),    glm::vec3(0.f, 0.f, 1.f),   glm::vec2(0.f, 1.f),
-        glm::vec3(0.5f, 0.5f, 0.f),     glm::vec3(1.f, 1.f, 0.f),   glm::vec2(1.f, 1.f)
-    };
-    unsigned nrOfVertices = sizeof(vertices) / sizeof(Vertex);
-
-    GLuint indices[] = {
-        0, 1, 2, //triangle 1
-        0, 2, 3 //triangle 2
-    };
-    unsigned nrOfIndices = sizeof(indices) / sizeof(GLuint);
-    */
-
-
+    //main loop
     void Window::run(){
 
         //TODO create a function to draw some vertices
@@ -231,27 +217,11 @@ namespace graphicslib {
         modelMatrix = utils::scale(modelMatrix, scale);
         modelMatrix = modelMatrix.transpose();
 
-
-        /*
-        glm::vec3 position(0.f);
-        glm::vec3 rotation(0.f);
-        glm::vec3 scale(1.f);
-
-        glm::vec3 previousAngularVelocity(0.f);
-        glm::vec3 angularVelocity(0.f);
-
-        glm::mat4 modelMatrix(1.f);
-        modelMatrix = glm::translate(modelMatrix, position);
-        modelMatrix = glm::rotate(modelMatrix, glm::radians(rotation.x), glm::vec3(1.f, 0.f, 0.f));
-        modelMatrix = glm::rotate(modelMatrix, glm::radians(rotation.y), glm::vec3(0.f, 1.f, 0.f));
-        modelMatrix = glm::rotate(modelMatrix, glm::radians(rotation.z), glm::vec3(0.f, 0.f, 1.f));
-        modelMatrix = glm::scale(modelMatrix, scale);
-        */
-
         glUseProgram(mCoreProgram);
 
         //glUniformMatrix4fv(glGetUniformLocation(mCoreProgram, "modelMatrix"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
-        glUniformMatrix4fv(glGetUniformLocation(mCoreProgram, "modelMatrix"), 1, GL_FALSE, &(modelMatrix.getMatrix()[0][0]));
+        //glUniformMatrix4fv(glGetUniformLocation(mCoreProgram, "modelMatrix"), 1, GL_FALSE, &(modelMatrix.getMatrix()[0][0]));
+        glUniformMatrix4fv(glGetUniformLocation(mCoreProgram, "modelMatrix"), 1, GL_FALSE, *(modelMatrix.getMatrix()));
 
         glUseProgram(0);
 
@@ -272,15 +242,6 @@ namespace graphicslib {
             glUseProgram(mCoreProgram);
 
             angle += angularVelocity;
-            /*
-            modelMatrix = glm::mat4(1.f);
-            modelMatrix = glm::translate(modelMatrix, position);
-            modelMatrix = glm::rotate(modelMatrix, glm::radians(rotation.x), glm::vec3(1.f, 0.f, 0.f));
-            modelMatrix = glm::rotate(modelMatrix, glm::radians(rotation.y), glm::vec3(0.f, 1.f, 0.f));
-            modelMatrix = glm::rotate(modelMatrix, glm::radians(rotation.z), glm::vec3(0.f, 0.f, 1.f));
-            modelMatrix = glm::scale(modelMatrix, scale);
-            */
-
 
             modelMatrix = ml::matrix<float>(4, 4, true);
             modelMatrix = utils::translate(modelMatrix, position);
@@ -288,8 +249,6 @@ namespace graphicslib {
             modelMatrix = utils::scale(modelMatrix, scale);
             modelMatrix = modelMatrix.transpose();
 
-            //glUniformMatrix4fv(glGetUniformLocation(mCoreProgram, "modelMatrix"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
-            //glUniformMatrix4fv(glGetUniformLocation(mCoreProgram, "modelMatrix"), 1, GL_FALSE, &(modelMatrix.getMatrix()[0][0]));
             glUniformMatrix4fv(glGetUniformLocation(mCoreProgram, "modelMatrix"), 1, GL_FALSE, *(modelMatrix.getMatrix()));
 
 
@@ -316,8 +275,6 @@ namespace graphicslib {
     }
 
     //update the user input
-    //void Window::updateInput(GLFWwindow *window, glm::vec3 &position, glm::vec3 &rotation, glm::vec3 &scale,
-    //                         glm::vec3 &previousAngularVelocity, glm::vec3 &angularVelocity){
     void Window::updateInput(GLFWwindow *window, ml::matrix<float> &position, ml::matrix<float> &scale,
                              float &previousAngularVelocity, float &angularVelocity){
         if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS){

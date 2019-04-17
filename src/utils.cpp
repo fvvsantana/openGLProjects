@@ -32,7 +32,7 @@ namespace utils{
         return true;
     }
 
-    //apply a translation operation over the model matrix
+    //apply translation in the model matrix
     ml::matrix<float> translate(ml::matrix<float> &modelMatrix, ml::matrix<float> &position){
         int n = position.getRows() + 1;
         ml::matrix<float> translationMatrix(n, n, true);
@@ -44,6 +44,7 @@ namespace utils{
         return modelMatrix * translationMatrix;
     }
 
+    //apply rotation in the model matrix
     ml::matrix<float> rotateZ(ml::matrix<float> &modelMatrix, float angle){
         ml::matrix<float> rotationMatrix(4, 4, true);
         rotationMatrix[0][0] = cos(angle);
@@ -54,6 +55,7 @@ namespace utils{
         return modelMatrix * rotationMatrix;
     }
 
+    //apply scale in the model matrix
     ml::matrix<float> scale(ml::matrix<float> &modelMatrix, ml::matrix<float> &scale){
         int n = scale.getRows() + 1;
         ml::matrix<float> scaleMatrix(n, n, true);

@@ -20,6 +20,7 @@ namespace tester {
         std::cout << "modelMatrix:\n" << modelMatrix << std::endl;
     }
 
+    //test translation
     void translationTest(){
         ml::matrix<float> position(3, 1);
         position[0][0] = 1;
@@ -34,6 +35,7 @@ namespace tester {
         std::cout << "translation matrix:" << std::endl << translationMatrix << std::endl;
     }
 
+    //test rotation
     void rotationTest(){
         float angle = 3.1415/6.f;
         ml::matrix<float> identityMatrix(4, 4, true);
@@ -45,6 +47,7 @@ namespace tester {
         std::cout << "rotation matrix:" << std::endl << rotationMatrix << std::endl;
     }
 
+    //test scale
     void scaleTest(){
         ml::matrix<float> scale(2.f, 3, 1);
         ml::matrix<float> identityMatrix(4, 4, true);

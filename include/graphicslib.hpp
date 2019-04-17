@@ -36,17 +36,16 @@ namespace graphicslib {
 
     public:
 
-        //TODO refactor these comments
-        /// Instantiates glfw environment
+        //init glfw stuff
         Window(int windowWidth, int windowHeight);
 
-        /// Finalizes glfw environment
+        //destroy everything
         ~Window();
 
-        /// Create single window of 800x600 size
+        //create the window, load glad, load shaders
         void createWindow();
 
-        /// Run the application in a loop.
+        //main loop
         void run();
     };
 }
