@@ -1,0 +1,13 @@
+Requisitos para compilação:
+    - cmake
+    - make
+    - g++
+
+Criando e acessando a pasta de compilação:
+    mkdir build && cd build
+
+Preparando o ambiente:
+    cmake ..
+
+Compilando e executando:
+    make all run
