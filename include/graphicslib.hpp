@@ -23,12 +23,11 @@ namespace graphicslib {
         int mWindowHeight;
         GLFWwindow* mWindow;
         GLuint mCoreProgram;
-        bool spaceReleased;
 
         //callback function to execute when the window is resized
         static void framebufferResizeCallback(GLFWwindow* window, int fbWidth, int fbHeight);
         void updateInput(GLFWwindow *window, ml::matrix<float> &position, ml::matrix<float> &scale,
-                             float &previousAngularVelocity, float &angularVelocity);
+                             float &previousAngularVelocity, float &angularVelocity, bool &spaceReleased);
         bool loadShaders(GLuint &program, char* vertexShaderFile, char* fragmentShaderFile);
 
     public:

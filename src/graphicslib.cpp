@@ -25,7 +25,6 @@ namespace graphicslib {
         mWindowHeight = windowHeight;
         mWindow = NULL;
         mCoreProgram = 0;
-        spaceReleased = true;
     }
 
     //destroy everything
@@ -203,13 +202,15 @@ namespace graphicslib {
         modelMatrix = utils::scale(modelMatrix, scale);
         modelMatrix = modelMatrix.transpose();
 
+        //allow to pause the rotation only if the space key was previously released
+        bool spaceReleased = true;
 
         while(!glfwWindowShouldClose(mWindow)){
             //update input
             glfwPollEvents();
 
             //update
-            updateInput(mWindow, position, scale, previousAngularVelocity, angularVelocity);
+            updateInput(mWindow, position, scale, previousAngularVelocity, angularVelocity, spaceReleased);
 
             //draw
             //clear
@@ -255,7 +256,7 @@ namespace graphicslib {
 
     //update the user input
     void Window::updateInput(GLFWwindow *window, ml::matrix<float> &position, ml::matrix<float> &scale,
-                             float &previousAngularVelocity, float &angularVelocity){
+                             float &previousAngularVelocity, float &angularVelocity, bool &spaceReleased){
         if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS){
             glfwSetWindowShouldClose(window, GLFW_TRUE);
         }
