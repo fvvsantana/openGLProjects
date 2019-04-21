@@ -29,6 +29,7 @@ namespace graphicslib {
         void updateInput(GLFWwindow *window, ml::matrix<float> &position, ml::matrix<float> &scale,
                              float &previousAngularVelocity, float &angularVelocity, bool &spaceReleased);
         bool loadShaders(GLuint &program, char* vertexShaderFile, char* fragmentShaderFile);
+        static void glfwErrorCallback(int error, const char* description);
 
     public:
 
