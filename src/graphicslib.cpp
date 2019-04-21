@@ -9,9 +9,9 @@
 
 namespace graphicslib {
 
-    //init glfw stuff
+    //initialize glfw stuff
     Window::Window(int windowWidth, int windowHeight){
-        //init glfw
+        //initialize glfw
         glfwInit();
 
         //set some window options
@@ -97,7 +97,8 @@ namespace graphicslib {
 
     }
 
-    //main loop
+    //set windmill properties, generate and configure vertex arrays and buffers,
+    //initialize run-time variables and execute the main loop
     void Window::run(){
 
         Vertex vertices[] = {
@@ -206,20 +207,20 @@ namespace graphicslib {
         bool spaceReleased = true;
 
         while(!glfwWindowShouldClose(mWindow)){
-            //update input
+            //process pending events
             glfwPollEvents();
 
-            //update
+            //receive inputs from the user
             updateInput(mWindow, position, scale, previousAngularVelocity, angularVelocity, spaceReleased);
 
-            //draw
-            //clear
+            //fill the background color
             glClearColor(0.f, 0.f, 0.f, 1.f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-            //use a program
+            //use previously initialized program
             glUseProgram(mCoreProgram);
 
+            //update windmill properties
             angle += angularVelocity;
 
             modelMatrix = ml::matrix<float>(4, 4, true);
@@ -230,15 +231,14 @@ namespace graphicslib {
 
             glUniformMatrix4fv(glGetUniformLocation(mCoreProgram, "modelMatrix"), 1, GL_FALSE, *(modelMatrix.getMatrix()));
 
-
             //bind vertex array and element array objects
             glBindVertexArray(VAO);
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 
-            //draw
+            //draw the windmill on the screen
             glDrawElements(GL_TRIANGLES, nrOfIndices, GL_UNSIGNED_INT, 0);
 
-            //end draw
+            //swap buffers and flush
             glfwSwapBuffers(mWindow);
             glFlush();
 
