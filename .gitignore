@@ -2,5 +2,5 @@
 .depend
 obj/
 build/
-catavento
+opengl3DObject
 .vscode/
