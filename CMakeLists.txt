@@ -44,6 +44,7 @@ include_directories(${CMAKE_SOURCE_DIR}/include) #is this line inherited by the 
 #include_directories(${CMAKE_SOURCE_DIR}/external/)
 #include_directories(/usr/include/)
 include_directories(${CMAKE_SOURCE_DIR}/external/soil)
+include_directories(${CMAKE_SOURCE_DIR}/external/stb)
 
 #include_directories(${CMAKE_SOURCE_DIR}/external/glew/include/GL)
 #link_directories(${CMAKE_SOURCE_DIR}/external/lib)
