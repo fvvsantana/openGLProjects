@@ -1,10 +1,10 @@
-##Requisitos para compilação:
-    * cmake
-    * make
-    * g++
-    * assimp
+## Requisitos para compilação:
+* cmake
+* make
+* g++
+* assimp
 
-###Instalando assimp:
+### Instalando assimp:
 
 Para instalar assimp no ubuntu 18.04 execute:
 	sudo apt-get install libassimp4 assimp-utils
@@ -19,7 +19,7 @@ Para outras distribuições, instale a partir do código fonte:
 	sudo make install
 ```
 
-##Executando o projeto
+## Executando o projeto
 
 Para executar o projeto siga as instruções:
 
