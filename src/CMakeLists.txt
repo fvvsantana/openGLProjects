@@ -64,9 +64,16 @@ find_package(glm REQUIRED)
 include_directories(${GLM_INCLUDE_DIR})
 target_link_libraries(${EXECUTABLE} ${GLM_LIBRARY})
 
+#glfw linking
 find_package(glfw REQUIRED)
 include_directories(${GLFW_INCLUDE_DIR})
 target_link_libraries(${EXECUTABLE} ${GLFW_LIBRARY})
+
+#assimp linking
+find_package(assimp REQUIRED)
+include_directories(${ASSIMP_INCLUDE_DIR})
+target_link_libraries(${EXECUTABLE} ${ASSIMP_LIBRARY})
+
 
 
 target_link_libraries(${EXECUTABLE} ${ProjectId}lib)

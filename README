@@ -2,6 +2,7 @@ Requisitos para compilação:
     - cmake
     - make
     - g++
+    - assimp
 
 Criando e acessando a pasta de compilação:
     mkdir build && cd build

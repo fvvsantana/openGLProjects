@@ -27,6 +27,7 @@ include(ExternalProject)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include( Findglfw )
 include( Findglm )
+include( Findassimp )
 
 #find_package(GLEW REQUIRED)
 #if (GLEW_FOUND)

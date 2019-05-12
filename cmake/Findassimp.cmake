@@ -1,0 +1,42 @@
+#set variable
+set(FIND_ASSIMP_PATHS ${CMAKE_SOURCE_DIR}/external/assimp)
+
+
+#include the headers
+#find_path(GLM_INCLUDE_DIR include/
+        #PATHS ${FIND_GLM_PATHS})
+#find_path(GLM_INCLUDE_DIR glm
+        #PATH_SUFFIXES include
+        #PATHS ${FIND_GLM_PATHS})
+
+set(ASSIMP_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external/assimp/include)
+
+#set(ASSIMP_LIBRARY "assimp")
+#add_library(${ASSIMP_LIBRARY} SHARED IMPORTED)
+#set_target_properties(${ASSIMP_LIBRARY} PROPERTIES IMPORTED_LOCATION "${CMAKE_SOURCE_DIR}/external/assimp/lib/libassimp.so.4")
+
+FIND_LIBRARY( ASSIMP_LIBRARY assimp
+	/usr/lib64
+	/usr/lib
+	/usr/local/lib
+	/opt/local/lib
+	${CMAKE_SOURCE_DIR}/lib
+)
+
+IF(ASSIMP_INCLUDE_DIR AND ASSIMP_LIBRARY)
+	SET( ASSIMP_FOUND TRUE )
+ENDIF(ASSIMP_INCLUDE_DIR AND ASSIMP_LIBRARY)
+IF(ASSIMP_FOUND)
+	IF(NOT ASSIMP_FIND_QUIETLY)
+	MESSAGE(STATUS "Found ASSIMP: ${ASSIMP_LIBRARY}")
+	ENDIF(NOT ASSIMP_FIND_QUIETLY)
+ELSE(ASSIMP_FOUND)
+	IF(ASSIMP_FIND_REQUIRED)
+	MESSAGE(FATAL_ERROR "Could not find libASSIMP")
+	ENDIF(ASSIMP_FIND_REQUIRED)
+ENDIF(ASSIMP_FOUND)
+
+#find_library(ASSIMP_LIBRARY
+        #NAMES libassimp.so.4
+        #PATH_SUFFIXES lib
+        #PATHS ${FIND_ASSIMP_PATHS})
