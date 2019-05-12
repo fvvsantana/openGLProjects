@@ -5,8 +5,8 @@
 #include <utils.hpp>
 #include <tester.hpp>
 
-#define WINDOW_WIDTH 600
-#define WINDOW_HEIGHT 600
+#define WINDOW_WIDTH 800
+#define WINDOW_HEIGHT 800
 #define ROWS 2
 #define COLS 2
 

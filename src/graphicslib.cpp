@@ -6,6 +6,12 @@
 #include <graphicslib.hpp>
 #include <utils.hpp>
 #include <matrixlib.hpp>
+#include <shader.hpp>
+#include <model.hpp>
+
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 
 namespace graphicslib {
 
@@ -47,7 +53,7 @@ namespace graphicslib {
     //create the window, load glad, load shaders
     void Window::createWindow() {
         //create window
-        mWindow = glfwCreateWindow(mWindowWidth, mWindowHeight, "WINDMILL", NULL, NULL);
+        mWindow = glfwCreateWindow(mWindowWidth, mWindowHeight, "MODEL", NULL, NULL);
 
         if(mWindow == NULL) {
             std::cerr << "Failed to create GLFW window" << std::endl;
@@ -75,179 +81,69 @@ namespace graphicslib {
         //make possible using 3d
         glEnable(GL_DEPTH_TEST);
 
-        //remove what is behind some object and can't be seen
-        glEnable(GL_CULL_FACE);
-        //choose to cull the back of the objects
-        glCullFace(GL_BACK);
-        //count counter-clockwise and define the front face
-        glFrontFace(GL_CCW);
-
-        //enable blending of colors
-        glEnable(GL_BLEND);
-        //setting of how to blend
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-        //tell how opengl will fill the polygons
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-
-        //shader init
-        if(!loadShaders(mCoreProgram, (char *) "src/vertex_core.glsl", (char *) "src/fragment_core.glsl")){
-            std::cerr << "Failed to load shaders" << std::endl;
-            this->~Window();
-            return;
-        }
-
     }
 
-    //set windmill properties, generate and configure vertex arrays and buffers,
-    //initialize run-time variables and execute the main loop
+
     void Window::run(){
 
-        Vertex vertices[] = {
-            //central vertex
-            0.f, 0.f, 0.f,    1.f, 0.f, 0.f,   1.f, 1.f,
-            //right
-            0.25f, 0.f, 0.f,    0.f, 1.f, 0.f,   1.f, 1.f,
-            //top right
-            0.25f, 0.25f, 0.f,    0.f, 0.f, 1.f,   1.f, 1.f,
-            //top
-            0.f, 0.25f, 0.f,    0.f, 1.f, 0.f,   1.f, 1.f,
-            //top left
-            -0.25f, 0.25f, 0.f,    0.f, 0.f, 1.f,   1.f, 1.f,
-            //left
-            -0.25f, 0.f, 0.f,    0.f, 1.f, 0.f,   1.f, 1.f,
-            //bottom left
-            -0.25f, -0.25f, 0.f,    0.f, 0.f, 1.f,   1.f, 1.f,
-            //bottom
-            0.f, -0.25f, 0.f,    0.f, 1.f, 0.f,   1.f, 1.f,
-            //bottom right
-            0.25f, -0.25f, 0.f,    0.f, 0.f, 1.f,   1.f, 1.f
-        } ;
+        // build and compile shaders
+        // -------------------------
+        Shader ourShader("src/model.vs", "src/model.fs");
 
-        GLuint indices[] = {
-            //top triangle
-            0,2,3,
-            //left triangle
-            0,4,5,
-            //bottom triangle
-            0,6,7,
-            //right triangle
-            0,8,1
-        };
+        // load models
+        // -----------
+        Model ourModel("resources/objects/nanosuit/nanosuit.obj");
 
-        unsigned nrOfIndices = sizeof(indices) / sizeof(GLuint);
+        float rotation_mobility = 1;
+        float scale_mobility = 0.001;
 
 
-        //model
+        modelCoord.position[0] = 0.f;
+        modelCoord.position[1] = -7.f;
+        modelCoord.position[2] = 0.f;
+        modelCoord.rotation[0] = 0.f;
+        modelCoord.rotation[1] = 180.f;
+        modelCoord.rotation[2] = 0.f;
+        modelCoord.scale[0] = 0.1f;
+        modelCoord.scale[1] = 0.1f;
+        modelCoord.scale[2] = 0.1f;
 
-        //vertex array object
-        GLuint VAO;
-        //create a vertex arrays in the VAO
-        glGenVertexArrays(1, &VAO);
-        //bind the vertex array to use
-        glBindVertexArray(VAO);
-
-        //gen vbo, bind and send data
-        //vertex buffer object
-        GLuint VBO;
-        //generate the vbo
-        glGenBuffers(1, &VBO);
-        //bind the vbo to the vao in the attach point array_buffer
-        glBindBuffer(GL_ARRAY_BUFFER, VBO);
-        //create a buffer data from the vertices data
-        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-        //gen ebo, bind and send data
-        //element buffer object
-        GLuint EBO;
-        //generate the ebo
-        glGenBuffers(1, &EBO);
-        //bind the ebo to the vao in the attach point element_array_buffer
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-        //create a buffer data from the indices data
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-        //set vertexAttribPointers and enable (input assembly)
-        //define an array of generic vertex attribute data
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid *)offsetof(Vertex, position));
-        //enable the created array
-        glEnableVertexAttribArray(0);
-
-
-        //color
-        //define an array of generic vertex attribute data
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid *)offsetof(Vertex, color));
-        //enable the created array
-        glEnableVertexAttribArray(1);
-
-        //texcoord
-        //define an array of generic vertex attribute data
-        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid *)offsetof(Vertex, texcoord));
-        //enable the created array
-        glEnableVertexAttribArray(2);
-
-        //unbind the vertex array and all buffers
-        glBindVertexArray(0);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-
-        ml::matrix<float> position(0.f, 3, 1);
-        float angle = 0.f;
-        ml::matrix<float> scale(1.f, 3, 1);
-
-        float previousAngularVelocity = 0.f;
-        float angularVelocity = -0.01f;
-
-        ml::matrix<float> modelMatrix(4, 4, true);
-        modelMatrix = utils::translate(modelMatrix, position);
-        modelMatrix = utils::rotateZ(modelMatrix, angle);
-        modelMatrix = utils::scale(modelMatrix, scale);
-        modelMatrix = modelMatrix.transpose();
-
-        //allow to pause the rotation only if the space key was previously released
-        bool spaceReleased = true;
-
+        // render loop
+        // -----------
         while(!glfwWindowShouldClose(mWindow)){
-            //process pending events
-            glfwPollEvents();
 
-            //receive inputs from the user
-            updateInput(mWindow, position, scale, previousAngularVelocity, angularVelocity, spaceReleased);
+            // input
+            // -----
+            updateInput(mWindow, rotation_mobility, scale_mobility);
 
-            //fill the background color
-            glClearColor(0.f, 0.f, 0.f, 1.f);
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+            // render
+            // ------
+            glClearColor(0.05f, 0.05f, 0.05f, 1.0f);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-            //use previously initialized program
-            glUseProgram(mCoreProgram);
+            // don't forget to enable shader before setting uniforms
+            ourShader.use();
 
-            //update windmill properties
-            angle += angularVelocity;
+            // render the loaded model
+            glm::mat4 modelMatrix = glm::mat4(1.0f);
 
-            modelMatrix = ml::matrix<float>(4, 4, true);
-            modelMatrix = utils::translate(modelMatrix, position);
-            modelMatrix = utils::rotateZ(modelMatrix, angle);
-            modelMatrix = utils::scale(modelMatrix, scale);
-            modelMatrix = modelMatrix.transpose();
 
-            glUniformMatrix4fv(glGetUniformLocation(mCoreProgram, "modelMatrix"), 1, GL_FALSE, *(modelMatrix.getMatrix()));
+            modelMatrix = glm::rotate(modelMatrix, glm::radians(modelCoord.rotation[0]), glm::vec3(1.f, 0.f, 0.f));
+            modelMatrix = glm::rotate(modelMatrix, glm::radians(modelCoord.rotation[1]), glm::vec3(0.f, 1.f, 0.f));
+            modelMatrix = glm::rotate(modelMatrix, glm::radians(modelCoord.rotation[2]), glm::vec3(0.f, 0.f, 1.f));
 
-            //bind vertex array and element array objects
-            glBindVertexArray(VAO);
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+            modelMatrix = glm::scale(modelMatrix, glm::make_vec3(modelCoord.scale)); // it's a bit too big for our scene, so scale it down
 
-            //draw the windmill on the screen
-            glDrawElements(GL_TRIANGLES, nrOfIndices, GL_UNSIGNED_INT, 0);
+            modelMatrix = glm::translate(modelMatrix, glm::make_vec3(modelCoord.position)); // translate it down so it's at the center of the scene
 
-            //swap buffers and flush
+            ourShader.setMat4("model", modelMatrix);
+            ourModel.Draw(ourShader);
+
+
+            // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
+            // -------------------------------------------------------------------------------
             glfwSwapBuffers(mWindow);
-            glFlush();
-
-            glBindVertexArray(0);
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-            glUseProgram(0);
+            glfwPollEvents();
         }
 
     }
@@ -258,134 +154,51 @@ namespace graphicslib {
     }
 
     //update the user input
-    void Window::updateInput(GLFWwindow *window, ml::matrix<float> &position, ml::matrix<float> &scale,
-                             float &previousAngularVelocity, float &angularVelocity, bool &spaceReleased){
+    void Window::updateInput(GLFWwindow *window, float rotation_mobility, float scale_mobility){
+
+        bool shiftIsPressed = glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT);
+
         if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS){
             glfwSetWindowShouldClose(window, GLFW_TRUE);
         }
-        if(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS){
-            position[1][0] += 0.01f;
-        }
-        if(glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS){
-            position[1][0] -= 0.01f;
-        }
-        if(glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS){
-            position[0][0] += 0.01f;
-        }
-        if(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS){
-            position[0][0] -= 0.01f;
-        }
-        if(glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS){
-            angularVelocity += 0.001f;
-        }
-        if(glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS){
-            angularVelocity -= 0.001f;
-        }
-        if(glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS){
-            // prevents this block to be executed simultaneously when
-            // the user holds the space key
-            if(spaceReleased)
-            {
-                if(angularVelocity != 0.f){
-                    previousAngularVelocity = angularVelocity;
-                    angularVelocity = 0.f;
-                }else{
-                    angularVelocity = previousAngularVelocity;
-                }
+
+        if(shiftIsPressed){
+            if(glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS){
+                modelCoord.rotation[0] -= rotation_mobility;
             }
-            spaceReleased = false;
+            if(glfwGetKey(window, GLFW_KEY_Y) == GLFW_PRESS){
+                modelCoord.rotation[1] -= rotation_mobility;
+            }
+            if(glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS){
+                modelCoord.rotation[2] -= rotation_mobility;
+            }
+        }else{
+            if(glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS){
+                modelCoord.rotation[0] += rotation_mobility;
+            }
+            if(glfwGetKey(window, GLFW_KEY_Y) == GLFW_PRESS){
+                modelCoord.rotation[1] += rotation_mobility;
+            }
+            if(glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS){
+                modelCoord.rotation[2] += rotation_mobility;
+            }
+
         }
-        if(glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_RELEASE)
-            spaceReleased = true;
+
+        if(glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS){
+            modelCoord.scale[0] += scale_mobility;
+            modelCoord.scale[1] += scale_mobility;
+            modelCoord.scale[2] += scale_mobility;
+        }
+
+        if(glfwGetKey(window, GLFW_KEY_N) == GLFW_PRESS){
+            modelCoord.scale[0] -= scale_mobility;
+            modelCoord.scale[1] -= scale_mobility;
+            modelCoord.scale[2] -= scale_mobility;
+        }
     }
 
 
-    bool Window::loadShaders(GLuint &program, char* vertexShaderFile, char* fragmentShaderFile){
-        //success of the function
-        bool loadSuccess = true;
-        //variables for error logging
-        int logLength = 512;
-        char infoLog[logLength];
-        //auxiliary variable
-        GLint success;
-
-        std::string src = "";
-
-        //vertex shader
-
-        //copy file content to outputString
-        if(!utils::fileToString(vertexShaderFile, src)){
-            std::cerr << "ERROR::LOADSHADERS::COULD_NOT_OPEN_VERTEX_FILE" << std::endl;
-            loadSuccess = false;
-        }
-
-
-        //compile vertexShader
-        GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-        const GLchar* vertSrc = src.c_str();
-        glShaderSource(vertexShader, 1, &vertSrc, NULL);
-        glCompileShader(vertexShader);
-
-        //check success of shader compilation
-        glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-        if(!success){
-            glGetShaderInfoLog(vertexShader, logLength, NULL, infoLog);
-            std::cerr << "ERROR::LOADSHADERS::COULD_NOT_COMPILE_VERTEX_SHADER" << std::endl;
-            std::cerr << infoLog << std::endl;
-            loadSuccess = false;
-        }
-
-        //clear shader source code
-        src.clear();
-
-        //fragment shader
-
-        //copy file content to outputString
-        if(!utils::fileToString(fragmentShaderFile, src)){
-            std::cerr << "ERROR::LOADSHADERS::COULD_NOT_OPEN_FRAGMENT_FILE" << std::endl;
-            loadSuccess = false;
-        }
-
-        //compile fragment shader
-        GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-        const GLchar* fragSrc = src.c_str();
-        glShaderSource(fragmentShader, 1, &fragSrc, NULL);
-        glCompileShader(fragmentShader);
-
-        //check success of shader compilation
-        glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-        if(!success){
-            glGetShaderInfoLog(fragmentShader, logLength, NULL, infoLog);
-            std::cerr << "ERROR::LOADSHADERS::COULD_NOT_COMPILE_FRAGMENT_SHADER" << std::endl;
-            std::cerr << infoLog << std::endl;
-            loadSuccess = false;
-        }
-
-        //link program
-        program = glCreateProgram();
-
-        glAttachShader(program, vertexShader);
-        glAttachShader(program, fragmentShader);
-        glLinkProgram(program);
-
-        //check success of program linking
-        glGetProgramiv(program, GL_LINK_STATUS, &success);
-        if(!success){
-            glGetProgramInfoLog(program, logLength, NULL, infoLog);
-            std::cerr << "ERROR::LOADSHADERS::COULD_NOT_LINK_PROGRAM" << std::endl;
-            std::cerr << infoLog << std::endl;
-            loadSuccess = false;
-        }
-
-        //End
-        //reset step
-        glUseProgram(0);
-        //delete shaders
-        glDeleteShader(vertexShader);
-        glDeleteShader(fragmentShader);
-
-        return loadSuccess;
-    }
 
     void Window::glfwErrorCallback(int error, const char* description) {
     std::cerr << "GLFW error code " << error << ". Description: " << description << std::endl;
