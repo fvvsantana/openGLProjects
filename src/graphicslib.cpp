@@ -88,11 +88,11 @@ namespace graphicslib {
 
         // build and compile shaders
         // -------------------------
-        Shader ourShader("src/model.vs", "src/model.fs");
+        Shader shader("src/model.vs", "src/model.fs");
 
         // load models
         // -----------
-        Model ourModel("resources/objects/nanosuit/nanosuit.obj");
+        Model model("resources/objects/nanosuit/nanosuit.obj");
 
         float rotation_mobility = 1;
         float scale_mobility = 0.001;
@@ -122,7 +122,7 @@ namespace graphicslib {
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             // don't forget to enable shader before setting uniforms
-            ourShader.use();
+            shader.use();
 
             // render the loaded model
             glm::mat4 modelMatrix = glm::mat4(1.0f);
@@ -136,8 +136,8 @@ namespace graphicslib {
 
             modelMatrix = glm::translate(modelMatrix, glm::make_vec3(modelCoord.position)); // translate it down so it's at the center of the scene
 
-            ourShader.setMat4("model", modelMatrix);
-            ourModel.Draw(ourShader);
+            shader.setMat4("model", modelMatrix);
+            model.Draw(shader);
 
 
             // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
