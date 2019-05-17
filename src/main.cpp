@@ -10,10 +10,11 @@
 #define ROWS 2
 #define COLS 2
 
-int main(int argc, char const *argv[]) {
+int main(int argc, char *argv[]) {
     graphicslib::Window window(WINDOW_WIDTH, WINDOW_HEIGHT);
     window.createWindow();
-    window.run();
+    std::cout << argv[1] << std::endl;
+    window.run(argv[1]);
 
     return 0;
 }

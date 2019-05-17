@@ -9,10 +9,6 @@
 #include <shader.hpp>
 #include <model.hpp>
 
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-
-
 namespace graphicslib {
 
     //initialize glfw stuff
@@ -84,7 +80,7 @@ namespace graphicslib {
     }
 
 
-    void Window::run(){
+    void Window::run(char *argument){
 
         // build and compile shaders
         // -------------------------
@@ -92,9 +88,9 @@ namespace graphicslib {
 
         // load models
         // -----------
-        Model ourModel("resources/objects/nanosuit/nanosuit.obj");
+        Model ourModel(argument);
 
-        float rotation_mobility = 1;
+        float rotation_mobility = 0.05;
         float scale_mobility = 0.001;
 
 
@@ -125,18 +121,19 @@ namespace graphicslib {
             ourShader.use();
 
             // render the loaded model
-            glm::mat4 modelMatrix = glm::mat4(1.0f);
+            ml::matrix<float> modelMatrix(4, 4, true);
 
+            modelMatrix = utils::rotateX(modelMatrix, modelCoord.rotation[0]);
+            modelMatrix = utils::rotateY(modelMatrix, modelCoord.rotation[1]);
+            modelMatrix = utils::rotateZ(modelMatrix, modelCoord.rotation[2]);
 
-            modelMatrix = glm::rotate(modelMatrix, glm::radians(modelCoord.rotation[0]), glm::vec3(1.f, 0.f, 0.f));
-            modelMatrix = glm::rotate(modelMatrix, glm::radians(modelCoord.rotation[1]), glm::vec3(0.f, 1.f, 0.f));
-            modelMatrix = glm::rotate(modelMatrix, glm::radians(modelCoord.rotation[2]), glm::vec3(0.f, 0.f, 1.f));
+            modelMatrix = utils::scale(modelMatrix, modelCoord.scale); // it's a bit too big for our scene, so scale it down
 
-            modelMatrix = glm::scale(modelMatrix, glm::make_vec3(modelCoord.scale)); // it's a bit too big for our scene, so scale it down
+            modelMatrix = utils::translate(modelMatrix, modelCoord.position); // translate it down so it's at the center of the scene
 
-            modelMatrix = glm::translate(modelMatrix, glm::make_vec3(modelCoord.position)); // translate it down so it's at the center of the scene
+            modelMatrix = modelMatrix.transpose();
 
-            ourShader.setMat4("model", modelMatrix);
+            ourShader.setMat4("model", modelMatrix.getMatrix());
             ourModel.Draw(ourShader);
 
 
@@ -164,16 +161,6 @@ namespace graphicslib {
 
         if(shiftIsPressed){
             if(glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS){
-                modelCoord.rotation[0] -= rotation_mobility;
-            }
-            if(glfwGetKey(window, GLFW_KEY_Y) == GLFW_PRESS){
-                modelCoord.rotation[1] -= rotation_mobility;
-            }
-            if(glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS){
-                modelCoord.rotation[2] -= rotation_mobility;
-            }
-        }else{
-            if(glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS){
                 modelCoord.rotation[0] += rotation_mobility;
             }
             if(glfwGetKey(window, GLFW_KEY_Y) == GLFW_PRESS){
@@ -181,6 +168,16 @@ namespace graphicslib {
             }
             if(glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS){
                 modelCoord.rotation[2] += rotation_mobility;
+            }
+        }else{
+            if(glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS){
+                modelCoord.rotation[0] -= rotation_mobility;
+            }
+            if(glfwGetKey(window, GLFW_KEY_Y) == GLFW_PRESS){
+                modelCoord.rotation[1] -= rotation_mobility;
+            }
+            if(glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS){
+                modelCoord.rotation[2] -= rotation_mobility;
             }
 
         }

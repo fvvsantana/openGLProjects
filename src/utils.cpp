@@ -33,6 +33,17 @@ namespace utils{
     }
 
     //apply translation in the model matrix
+    ml::matrix<float> translate(ml::matrix<float> &modelMatrix, float* position){
+        int n = 4;
+        ml::matrix<float> translationMatrix(n, n, true);
+        int i;
+        for(i=0; i<n-1; i++){
+            translationMatrix[i][n-1] = position[i];
+        }
+
+        return modelMatrix * translationMatrix;
+    }
+
     ml::matrix<float> translate(ml::matrix<float> &modelMatrix, ml::matrix<float> &position){
         int n = position.getRows() + 1;
         ml::matrix<float> translationMatrix(n, n, true);
@@ -44,7 +55,7 @@ namespace utils{
         return modelMatrix * translationMatrix;
     }
 
-    //apply rotation in the model matrix
+    //apply rotation around Z axis in the model matrix
     ml::matrix<float> rotateZ(ml::matrix<float> &modelMatrix, float angle){
         ml::matrix<float> rotationMatrix(4, 4, true);
         rotationMatrix[0][0] = cos(angle);
@@ -55,7 +66,39 @@ namespace utils{
         return modelMatrix * rotationMatrix;
     }
 
+    //apply rotation around X axis in the model matrix
+    ml::matrix<float> rotateX(ml::matrix<float> &modelMatrix, float angle){
+        ml::matrix<float> rotationMatrix(4, 4, true);
+        rotationMatrix[1][1] = cos(angle);
+        rotationMatrix[1][2] = (-1) * sin(angle);
+        rotationMatrix[2][1] = sin(angle);
+        rotationMatrix[2][2] = cos(angle);
+
+        return modelMatrix * rotationMatrix;
+    }
+
+    //apply rotation around Y axis in the model matrix
+    ml::matrix<float> rotateY(ml::matrix<float> &modelMatrix, float angle){
+        ml::matrix<float> rotationMatrix(4, 4, true);
+        rotationMatrix[0][0] = cos(angle);
+        rotationMatrix[2][0] = (-1) * sin(angle);
+        rotationMatrix[0][2] = sin(angle);
+        rotationMatrix[2][2] = cos(angle);
+
+        return modelMatrix * rotationMatrix;
+    }
     //apply scale in the model matrix
+    ml::matrix<float> scale(ml::matrix<float> &modelMatrix, float* scale){
+        int n = 4;
+        ml::matrix<float> scaleMatrix(n, n, true);
+        int i;
+        for(i=0; i<n-1; i++){
+            scaleMatrix[i][i] = scale[i];
+        }
+
+        return modelMatrix * scaleMatrix;
+    }
+
     ml::matrix<float> scale(ml::matrix<float> &modelMatrix, ml::matrix<float> &scale){
         int n = scale.getRows() + 1;
         ml::matrix<float> scaleMatrix(n, n, true);

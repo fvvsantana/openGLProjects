@@ -52,7 +52,7 @@ namespace graphicslib {
         void createWindow();
 
         //main loop
-        void run();
+        void run(char *argument);
     };
 }
 
