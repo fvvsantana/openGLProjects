@@ -80,7 +80,7 @@ namespace graphicslib {
     }
 
 
-    void Window::run(char *argument){
+    void Window::run(char *filepath){
 
         // build and compile shaders
         // -------------------------
@@ -88,7 +88,7 @@ namespace graphicslib {
 
         // load models
         // -----------
-        Model ourModel(argument);
+        Model ourModel(filepath);
 
         // calculate the bounding box of the model
         ourModel.calcBoundingBox();
