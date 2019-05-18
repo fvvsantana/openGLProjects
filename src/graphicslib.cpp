@@ -84,26 +84,26 @@ namespace graphicslib {
 
         // build and compile shaders
         // -------------------------
-        Shader ourShader("src/model.vs", "src/model.fs");
+        Shader shader("src/model.vs", "src/model.fs");
 
         // load models
         // -----------
-        Model ourModel(filepath);
+        Model model(filepath);
 
         // calculate the bounding box of the model
-        ourModel.calcBoundingBox();
+        model.calcBoundingBox();
 
         // size of the biggest dimension of the model
-        float size = ourModel.biggestDimensionSize();
+        float size = model.biggestDimensionSize();
 
         // rate on which the model will rotate and scale
         float rotation_mobility = 0.05;
         float scale_mobility = 0.001;
 
         // initial position
-        modelCoord.position[0] = -(ourModel.boundingBox.x.center);
-        modelCoord.position[1] = -(ourModel.boundingBox.y.center);
-        modelCoord.position[2] = -(ourModel.boundingBox.z.center);
+        modelCoord.position[0] = -(model.boundingBox.x.center);
+        modelCoord.position[1] = -(model.boundingBox.y.center);
+        modelCoord.position[2] = -(model.boundingBox.z.center);
 
         // initial rotation
         modelCoord.rotation[0] = 0.f;
@@ -129,7 +129,7 @@ namespace graphicslib {
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             // don't forget to enable shader before setting uniforms
-            ourShader.use();
+            shader.use();
 
             // render the loaded model
             ml::matrix<float> modelMatrix(4, 4, true);
@@ -144,8 +144,8 @@ namespace graphicslib {
 
             modelMatrix = modelMatrix.transpose();
 
-            ourShader.setMat4("model", modelMatrix.getMatrix());
-            ourModel.Draw(ourShader);
+            shader.setMat4("model", modelMatrix.getMatrix());
+            model.Draw(shader);
 
 
             // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
