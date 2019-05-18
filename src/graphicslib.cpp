@@ -90,19 +90,30 @@ namespace graphicslib {
         // -----------
         Model ourModel(argument);
 
+        // calculate the bounding box of the model
+        ourModel.calcBoundingBox();
+
+        // size of the biggest dimension of the model
+        float size = ourModel.biggestDimensionSize();
+
+        // rate on which the model will rotate and scale
         float rotation_mobility = 0.05;
         float scale_mobility = 0.001;
 
+        // initial position
+        modelCoord.position[0] = -(ourModel.boundingBox.x.center);
+        modelCoord.position[1] = -(ourModel.boundingBox.y.center);
+        modelCoord.position[2] = -(ourModel.boundingBox.z.center);
 
-        modelCoord.position[0] = 0.f;
-        modelCoord.position[1] = -7.f;
-        modelCoord.position[2] = 0.f;
+        // initial rotation
         modelCoord.rotation[0] = 0.f;
         modelCoord.rotation[1] = 180.f;
         modelCoord.rotation[2] = 0.f;
-        modelCoord.scale[0] = 0.1f;
-        modelCoord.scale[1] = 0.1f;
-        modelCoord.scale[2] = 0.1f;
+
+        // initial scale
+        modelCoord.scale[0] = 2.f/size;
+        modelCoord.scale[1] = 2.f/size;
+        modelCoord.scale[2] = 2.f/size;
 
         // render loop
         // -----------

@@ -23,6 +23,21 @@ using namespace std;
 
 unsigned int TextureFromFile(const char *path, const string &directory, bool gamma = false);
 
+struct Dimension
+{
+    float min;
+    float max;
+    float center;
+    float size;
+};
+
+struct BoundingBox
+{
+    Dimension x;
+    Dimension y;
+    Dimension z;
+};
+
 class Model 
 {
 public:
@@ -31,6 +46,7 @@ public:
     vector<Mesh> meshes;
     string directory;
     bool gammaCorrection;
+    BoundingBox boundingBox;
 
     /*  Functions   */
     // constructor, expects a filepath to a 3D model.
@@ -45,7 +61,32 @@ public:
         for(unsigned int i = 0; i < meshes.size(); i++)
             meshes[i].Draw(shader);
     }
-    
+
+    // calculate the bounding box of the model
+    void calcBoundingBox()
+    {
+        boundingBox.x = xLimits();
+        boundingBox.y = yLimits();
+        boundingBox.z = zLimits();
+
+        boundingBox.x.center = (boundingBox.x.min + boundingBox.x.max)/2;
+        boundingBox.y.center = (boundingBox.y.min + boundingBox.y.max)/2;
+        boundingBox.z.center = (boundingBox.z.min + boundingBox.z.max)/2;
+
+        boundingBox.x.size = boundingBox.x.max - boundingBox.x.min;
+        boundingBox.y.size = boundingBox.y.max - boundingBox.y.min;
+        boundingBox.z.size = boundingBox.z.max - boundingBox.z.min;
+    }
+
+    // find the size of the biggest dimension of the bounding box
+    float biggestDimensionSize()
+    {
+        float biggest = max(boundingBox.x.size, boundingBox.y.size);
+        biggest = max(biggest, boundingBox.z.size);
+
+        return biggest;
+    }
+
 private:
     /*  Functions   */
     // loads a model with supported ASSIMP extensions from file and stores the resulting meshes in the meshes vector.
@@ -203,6 +244,69 @@ private:
             }
         }
         return textures;
+    }
+
+    // finds the lowest and highest vertices of the model on the X axis
+    Dimension xLimits()
+    {
+        Dimension x;
+        x.min = meshes[0].vertices[0].Position.x,
+        x.max = x.min;
+
+        for(auto mesh : meshes)
+        {
+            for(auto vertex : mesh.vertices)
+            {
+                if(vertex.Position.x < x.min)
+                    x.min = vertex.Position.x;
+                else if(vertex.Position.x > x.max)
+                    x.max = vertex.Position.x;
+            }
+        }
+
+        return x;
+    }
+    
+    // finds the lowest and highest vertices of the model on the Y axis
+    Dimension yLimits()
+    {
+        Dimension y;
+        y.min = meshes[0].vertices[0].Position.y,
+        y.max = y.min;
+
+        for(auto mesh : meshes)
+        {
+            for(auto vertex : mesh.vertices)
+            {
+                if(vertex.Position.y < y.min)
+                    y.min = vertex.Position.y;
+                else if(vertex.Position.y > y.max)
+                    y.max = vertex.Position.y;
+            }
+        }
+
+        return y;
+    }
+
+    // finds the lowest and highest vertices of the model on the Z axis
+    Dimension zLimits()
+    {
+        Dimension z;
+        z.min = meshes[0].vertices[0].Position.z,
+        z.max = z.min;
+
+        for(auto mesh : meshes)
+        {
+            for(auto vertex : mesh.vertices)
+            {
+                if(vertex.Position.z < z.min)
+                    z.min = vertex.Position.z;
+                else if(vertex.Position.z > z.max)
+                    z.max = vertex.Position.z;
+            }
+        }
+
+        return z;
     }
 };
 
