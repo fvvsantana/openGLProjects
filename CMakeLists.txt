@@ -8,7 +8,7 @@ string(REPLACE " " "_" ProjectId ${ProjectId})
 #project name:
 project(${ProjectId})
 
-set(CMAKE_CXX_FLAGS "-g -Wall")
+set(CMAKE_CXX_FLAGS "-g -Wall -std=c++17")
 #set(CMAKE_CXX_FLAGS "-g -Wall -lGLEW  -lGL -lX11 -lXi -lXrandr -lXxf86vm -lXinerama -lXcursor -lrt -lm -pthread")
 #find_package(GLUT)
 #find_package(GLM REQUIRED)
