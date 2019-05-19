@@ -138,9 +138,9 @@ namespace graphicslib {
             modelMatrix = utils::rotateY(modelMatrix, modelCoord.rotation[1]);
             modelMatrix = utils::rotateZ(modelMatrix, modelCoord.rotation[2]);
 
-            modelMatrix = utils::scale(modelMatrix, modelCoord.scale); // it's a bit too big for our scene, so scale it down
+            modelMatrix = utils::scale(modelMatrix, modelCoord.scale);
 
-            modelMatrix = utils::translate(modelMatrix, modelCoord.position); // translate it down so it's at the center of the scene
+            modelMatrix = utils::translate(modelMatrix, modelCoord.position);
 
             modelMatrix = modelMatrix.transpose();
 
