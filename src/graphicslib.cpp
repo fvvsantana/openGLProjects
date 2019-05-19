@@ -97,8 +97,8 @@ namespace graphicslib {
         float size = model.biggestDimensionSize();
 
         // rate on which the model will rotate and scale
-        float rotation_mobility = 0.05;
-        float scale_mobility = 0.001;
+        float rotation_mobility = 0.03;
+        float scale_mobility = 0.003;
 
         // initial position
         modelCoord.position[0] = -(model.boundingBox.x.center);
