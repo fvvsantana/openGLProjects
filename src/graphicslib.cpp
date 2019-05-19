@@ -107,7 +107,7 @@ namespace graphicslib {
 
         // initial rotation
         modelCoord.rotation[0] = 0.f;
-        modelCoord.rotation[1] = 180.f;
+        modelCoord.rotation[1] = 0.f;
         modelCoord.rotation[2] = 0.f;
 
         // initial scale
