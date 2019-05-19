@@ -34,7 +34,13 @@ Prepare o ambiente:
     cmake ..
 ```
 
-Compile e execute:
+Compile:
 ```
-    make all run
+    make
+```
+
+Execute:
+```
+    cd ..
+    ./opengl3DObject [nome do arquivo objeto]
 ```
