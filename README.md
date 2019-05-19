@@ -1,7 +1,7 @@
 ## Requisitos para compilação:
 * cmake
 * make
-* g++
+* g++ com suporte a C++ 17
 * assimp
 
 ### Instalando assimp:
