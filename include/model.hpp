@@ -19,6 +19,8 @@
 #include <iostream>
 #include <map>
 #include <vector>
+#include <algorithm>
+
 using namespace std;
 
 unsigned int TextureFromFile(const char *path, const string &directory, bool gamma = false);
@@ -81,8 +83,8 @@ public:
     // find the size of the biggest dimension of the bounding box
     float biggestDimensionSize()
     {
-        float biggest = max(boundingBox.x.size, boundingBox.y.size);
-        biggest = max(biggest, boundingBox.z.size);
+        float biggest = std::max(boundingBox.x.size, boundingBox.y.size);
+        biggest = std::max(biggest, boundingBox.z.size);
 
         return biggest;
     }
