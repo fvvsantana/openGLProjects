@@ -3,7 +3,6 @@
 
 #include <graphicslib.hpp>
 #include <utils.hpp>
-#include <tester.hpp>
 
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 800
