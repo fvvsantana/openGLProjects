@@ -203,17 +203,28 @@ namespace graphicslib {
             glfwSetWindowShouldClose(window, true);
         }
 
-        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS){
-            camera.ProcessKeyboard(FORWARD, mDeltaTime);
-        }
-        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS){
-            camera.ProcessKeyboard(BACKWARD, mDeltaTime);
-        }
-        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS){
-            camera.ProcessKeyboard(LEFT, mDeltaTime);
-        }
-        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS){
-            camera.ProcessKeyboard(RIGHT, mDeltaTime);
+        bool shiftIsPressed = glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS;
+
+        if(shiftIsPressed){
+            if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS){
+                camera.ProcessKeyboard(UP, mDeltaTime);
+            }
+            if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS){
+                camera.ProcessKeyboard(DOWN, mDeltaTime);
+            }
+        }else{
+            if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS){
+                camera.ProcessKeyboard(FORWARD, mDeltaTime);
+            }
+            if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS){
+                camera.ProcessKeyboard(BACKWARD, mDeltaTime);
+            }
+            if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS){
+                camera.ProcessKeyboard(LEFT, mDeltaTime);
+            }
+            if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS){
+                camera.ProcessKeyboard(RIGHT, mDeltaTime);
+            }
         }
     }
 
