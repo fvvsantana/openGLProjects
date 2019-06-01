@@ -8,8 +8,17 @@
 #include <matrixlib.hpp>
 #include <shader.hpp>
 #include <model.hpp>
+#include <camera.hpp>
 
 namespace graphicslib {
+
+    void mouseCallback(GLFWwindow* window, double xpos, double ypos);
+    void scrollCallback(GLFWwindow* window, double xoffset, double yoffset);
+    // camera
+    Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+    float lastX;
+    float lastY;
+    float firstMouse = true;
 
     //initialize glfw stuff
     Window::Window(int windowWidth, int windowHeight){
@@ -30,6 +39,17 @@ namespace graphicslib {
         mWindowHeight = windowHeight;
         mWindow = NULL;
         mCoreProgram = 0;
+
+
+        lastX = windowWidth/2.0f;
+        lastY = windowHeight/2.0f;
+
+        mOrthogonalProjection = true;
+        mPReleased = true;
+
+        // timing
+        mDeltaTime = 0.0f;
+        mLastFrame = 0.0f;
     }
 
     //destroy everything
@@ -49,7 +69,7 @@ namespace graphicslib {
     //create the window, load glad, load shaders
     void Window::createWindow() {
         //create window
-        mWindow = glfwCreateWindow(mWindowWidth, mWindowHeight, "MODEL", NULL, NULL);
+        mWindow = glfwCreateWindow(mWindowWidth, mWindowHeight, "Camera View", NULL, NULL);
 
         if(mWindow == NULL) {
             std::cerr << "Failed to create GLFW window" << std::endl;
@@ -57,11 +77,16 @@ namespace graphicslib {
             return;
         }
 
-        //set callback function to call when resize
-        glfwSetFramebufferSizeCallback(mWindow, framebufferResizeCallback);
-
         //make context current
         glfwMakeContextCurrent(mWindow); //IMPORTANT!!
+
+        //set callback function to call when resize
+        glfwSetFramebufferSizeCallback(mWindow, framebufferResizeCallback);
+        glfwSetCursorPosCallback(mWindow, mouseCallback);
+        glfwSetScrollCallback(mWindow, scrollCallback);
+
+        // tell GLFW to capture our mouse
+        glfwSetInputMode(mWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
         //enable vsync
         glfwSwapInterval(1);
@@ -96,10 +121,6 @@ namespace graphicslib {
         // size of the biggest dimension of the model
         float size = model.biggestDimensionSize();
 
-        // rate on which the model will rotate and scale
-        float rotation_mobility = 0.03;
-        float scale_mobility = 0.003;
-
         // initial position
         modelCoord.position[0] = -(model.boundingBox.x.center);
         modelCoord.position[1] = -(model.boundingBox.y.center);
@@ -115,13 +136,23 @@ namespace graphicslib {
         modelCoord.scale[1] = 2.f/size;
         modelCoord.scale[2] = 2.f/size;
 
+        float currentFrame;
+        glm::mat4 projection;
+        glm::mat4 view;
+
         // render loop
         // -----------
         while(!glfwWindowShouldClose(mWindow)){
+            // per-frame time logic
+            // --------------------
+            currentFrame = glfwGetTime();
+            mDeltaTime = currentFrame - mLastFrame;
+            mLastFrame = currentFrame;
+
 
             // input
             // -----
-            updateInput(mWindow, rotation_mobility, scale_mobility);
+            updateInput(mWindow);
 
             // render
             // ------
@@ -131,20 +162,38 @@ namespace graphicslib {
             // don't forget to enable shader before setting uniforms
             shader.use();
 
-            // render the loaded model
-            ml::matrix<float> modelMatrix(4, 4, true);
+            if(mOrthogonalProjection){
+                //use orthogonal projection
+                //projection = glm::ortho(0.f, (float) mWindowWidth, (float) mWindowHeight, 0.f, 0.1f, 100.0f);
+                projection = glm::perspective(glm::radians(camera.Zoom + 5.f), (float)mWindowWidth / (float)mWindowHeight, 0.1f, 100.0f);
+            }else{
+                //use perspective projection
+                projection = glm::perspective(glm::radians(camera.Zoom), (float)mWindowWidth / (float)mWindowHeight, 0.1f, 100.0f);
+            }
+            // view/projection transformations
+            view = camera.GetViewMatrix();
+            shader.setMat4("projection", projection);
+            shader.setMat4("view", view);
 
+            // apply rotation
+            ml::matrix<float> modelMatrix(4, 4, true);
             modelMatrix = utils::rotateX(modelMatrix, modelCoord.rotation[0]);
             modelMatrix = utils::rotateY(modelMatrix, modelCoord.rotation[1]);
             modelMatrix = utils::rotateZ(modelMatrix, modelCoord.rotation[2]);
 
+            // apply scale
             modelMatrix = utils::scale(modelMatrix, modelCoord.scale);
 
+            // apply translation
             modelMatrix = utils::translate(modelMatrix, modelCoord.position);
 
+            //transpose the matrix
             modelMatrix = modelMatrix.transpose();
 
+            //pass the model matrix to the shader
             shader.setMat4("model", modelMatrix.getMatrix());
+
+            // render the loaded model
             model.Draw(shader);
 
 
@@ -161,51 +210,75 @@ namespace graphicslib {
         glViewport(0, 0, fbWidth, fbHeight);
     }
 
+
     //update the user input
-    void Window::updateInput(GLFWwindow *window, float rotation_mobility, float scale_mobility){
-
-        bool shiftIsPressed = glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT);
-
-        if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS){
-            glfwSetWindowShouldClose(window, GLFW_TRUE);
+    void Window::updateInput(GLFWwindow *window){
+        if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS){
+            glfwSetWindowShouldClose(window, true);
         }
+
+        bool shiftIsPressed = glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS;
 
         if(shiftIsPressed){
-            if(glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS){
-                modelCoord.rotation[0] += rotation_mobility;
+            if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS){
+                camera.ProcessKeyboard(UP, mDeltaTime);
             }
-            if(glfwGetKey(window, GLFW_KEY_Y) == GLFW_PRESS){
-                modelCoord.rotation[1] += rotation_mobility;
-            }
-            if(glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS){
-                modelCoord.rotation[2] += rotation_mobility;
+            if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS){
+                camera.ProcessKeyboard(DOWN, mDeltaTime);
             }
         }else{
-            if(glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS){
-                modelCoord.rotation[0] -= rotation_mobility;
+            if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS){
+                camera.ProcessKeyboard(FORWARD, mDeltaTime);
             }
-            if(glfwGetKey(window, GLFW_KEY_Y) == GLFW_PRESS){
-                modelCoord.rotation[1] -= rotation_mobility;
+            if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS){
+                camera.ProcessKeyboard(BACKWARD, mDeltaTime);
             }
-            if(glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS){
-                modelCoord.rotation[2] -= rotation_mobility;
-            }
-
+        }
+        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS){
+            camera.ProcessKeyboard(LEFT, mDeltaTime);
+        }
+        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS){
+            camera.ProcessKeyboard(RIGHT, mDeltaTime);
         }
 
-        if(glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS){
-            modelCoord.scale[0] += scale_mobility;
-            modelCoord.scale[1] += scale_mobility;
-            modelCoord.scale[2] += scale_mobility;
+        if(mPReleased){
+            if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS){
+                mOrthogonalProjection = !mOrthogonalProjection;
+            }
+            mPReleased = false;
+        }
+        if (glfwGetKey(window, GLFW_KEY_P) == GLFW_RELEASE){
+            mPReleased = true;
         }
 
-        if(glfwGetKey(window, GLFW_KEY_N) == GLFW_PRESS){
-            modelCoord.scale[0] -= scale_mobility;
-            modelCoord.scale[1] -= scale_mobility;
-            modelCoord.scale[2] -= scale_mobility;
-        }
     }
 
+    // glfw: whenever the mouse moves, this callback is called
+    // -------------------------------------------------------
+    void mouseCallback(GLFWwindow* window, double xpos, double ypos)
+    {
+        if (firstMouse)
+        {
+            lastX = xpos;
+            lastY = ypos;
+            firstMouse = false;
+        }
+
+        float xoffset = xpos - lastX;
+        float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
+
+        lastX = xpos;
+        lastY = ypos;
+
+        camera.ProcessMouseMovement(xoffset, yoffset);
+    }
+
+    // glfw: whenever the mouse scroll wheel scrolls, this callback is called
+    // ----------------------------------------------------------------------
+    void scrollCallback(GLFWwindow* window, double xoffset, double yoffset)
+    {
+        camera.ProcessMouseScroll(yoffset);
+    }
 
 
     void Window::glfwErrorCallback(int error, const char* description) {
