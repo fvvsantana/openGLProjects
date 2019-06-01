@@ -1,5 +1,5 @@
-#ifndef MESH_H
-#define MESH_H
+#ifndef MESH_HPP
+#define MESH_HPP
 
 #include <glm/glm.hpp>
 

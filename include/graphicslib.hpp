@@ -5,7 +5,6 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include <glm/mat4x4.hpp>
 
 namespace ml{
     template<class T>
@@ -25,6 +24,7 @@ namespace graphicslib {
         float scale[3];
     };
 
+
     class Window {
     private:
         int mWindowWidth;
@@ -34,9 +34,16 @@ namespace graphicslib {
 
         ModelCoordinates modelCoord;
 
+
+        // timing
+        float mDeltaTime;
+        float mLastFrame;
+
+
         //callback function to execute when the window is resized
         static void framebufferResizeCallback(GLFWwindow* window, int fbWidth, int fbHeight);
-        void updateInput(GLFWwindow *window, float rotation_mobility, float scale_mobility);
+
+        void updateInput(GLFWwindow *window);
 
         static void glfwErrorCallback(int error, const char* description);
 
