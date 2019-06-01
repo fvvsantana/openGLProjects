@@ -34,6 +34,9 @@ namespace graphicslib {
 
         ModelCoordinates modelCoord;
 
+        // perspective type
+        bool mOrthogonalProjection;
+        bool mPReleased;
 
         // timing
         float mDeltaTime;

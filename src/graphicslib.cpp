@@ -44,6 +44,9 @@ namespace graphicslib {
         lastX = windowWidth/2.0f;
         lastY = windowHeight/2.0f;
 
+        mOrthogonalProjection = true;
+        mPReleased = true;
+
         // timing
         mDeltaTime = 0.0f;
         mLastFrame = 0.0f;
@@ -133,12 +136,16 @@ namespace graphicslib {
         modelCoord.scale[1] = 2.f/size;
         modelCoord.scale[2] = 2.f/size;
 
+        float currentFrame;
+        glm::mat4 projection;
+        glm::mat4 view;
+
         // render loop
         // -----------
         while(!glfwWindowShouldClose(mWindow)){
             // per-frame time logic
             // --------------------
-            float currentFrame = glfwGetTime();
+            currentFrame = glfwGetTime();
             mDeltaTime = currentFrame - mLastFrame;
             mLastFrame = currentFrame;
 
@@ -155,9 +162,16 @@ namespace graphicslib {
             // don't forget to enable shader before setting uniforms
             shader.use();
 
+            if(mOrthogonalProjection){
+                //use orthogonal projection
+                //projection = glm::ortho(0.f, (float) mWindowWidth, (float) mWindowHeight, 0.f, 0.1f, 100.0f);
+                projection = glm::perspective(glm::radians(camera.Zoom + 5.f), (float)mWindowWidth / (float)mWindowHeight, 0.1f, 100.0f);
+            }else{
+                //use perspective projection
+                projection = glm::perspective(glm::radians(camera.Zoom), (float)mWindowWidth / (float)mWindowHeight, 0.1f, 100.0f);
+            }
             // view/projection transformations
-            glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)mWindowWidth / (float)mWindowHeight, 0.1f, 100.0f);
-            glm::mat4 view = camera.GetViewMatrix();
+            view = camera.GetViewMatrix();
             shader.setMat4("projection", projection);
             shader.setMat4("view", view);
 
@@ -219,13 +233,24 @@ namespace graphicslib {
             if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS){
                 camera.ProcessKeyboard(BACKWARD, mDeltaTime);
             }
-            if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS){
-                camera.ProcessKeyboard(LEFT, mDeltaTime);
-            }
-            if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS){
-                camera.ProcessKeyboard(RIGHT, mDeltaTime);
-            }
         }
+        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS){
+            camera.ProcessKeyboard(LEFT, mDeltaTime);
+        }
+        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS){
+            camera.ProcessKeyboard(RIGHT, mDeltaTime);
+        }
+
+        if(mPReleased){
+            if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS){
+                mOrthogonalProjection = !mOrthogonalProjection;
+            }
+            mPReleased = false;
+        }
+        if (glfwGetKey(window, GLFW_KEY_P) == GLFW_RELEASE){
+            mPReleased = true;
+        }
+
     }
 
     // glfw: whenever the mouse moves, this callback is called
