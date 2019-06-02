@@ -164,8 +164,8 @@ namespace graphicslib {
 
             if(mOrthogonalProjection){
                 //use orthogonal projection
-                //projection = glm::ortho(0.f, (float) mWindowWidth, (float) mWindowHeight, 0.f, 0.1f, 100.0f);
-                projection = glm::perspective(glm::radians(camera.Zoom + 5.f), (float)mWindowWidth / (float)mWindowHeight, 0.1f, 100.0f);
+                projection = glm::ortho(-1.5f, 1.5f, 1.5f, -1.5f, -10.f, 10.f);
+                //projection = glm::perspective(glm::radians(camera.Zoom + 5.f), (float)mWindowWidth / (float)mWindowHeight, 0.1f, 100.0f);
             }else{
                 //use perspective projection
                 projection = glm::perspective(glm::radians(camera.Zoom), (float)mWindowWidth / (float)mWindowHeight, 0.1f, 100.0f);
