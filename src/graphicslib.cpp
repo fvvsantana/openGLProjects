@@ -138,7 +138,6 @@ namespace graphicslib {
 
         float currentFrame;
         ml::matrix<float> projection(4, 4);
-        glm::mat4 view;
 
         // render loop
         // -----------
@@ -170,9 +169,9 @@ namespace graphicslib {
                 projection = utils::perspectiveMatrix();
             }
             // view/projection transformations
-            view = camera.GetViewMatrix();
             shader.setMat4("projection", projection.getMatrix());
-            shader.setMat4("view", view);
+            ml::matrix<float> view = camera.GetViewMatrix();
+            shader.setMat4("view", view.getMatrix());
 
             // apply rotation
             ml::matrix<float> modelMatrix(4, 4, true);

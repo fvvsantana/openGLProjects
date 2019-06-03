@@ -23,9 +23,28 @@ Camera::Camera(float posX, float posY, float posZ, float upX, float upY, float u
 }
 
 // Returns the view matrix calculated using Euler Angles and the LookAt Matrix
-glm::mat4 Camera::GetViewMatrix()
+ml::matrix<float> Camera::GetViewMatrix()
 {
-    return glm::lookAt(Position, Position + Front, Up);
+    ml::matrix<float> m1(4, 4, true);
+    ml::matrix<float> m2(4, 4, true);
+
+    m1[0][0] = Right.x;
+    m1[0][1] = Right.y;
+    m1[0][2] = Right.z;
+
+    m1[1][0] = Up.x;
+    m1[1][1] = Up.y;
+    m1[1][2] = Up.z;
+    
+    m1[2][0] = -Front.x;
+    m1[2][1] = -Front.y;
+    m1[2][2] = -Front.z;
+
+    m2[0][3] = -Position.x;
+    m2[1][3] = -Position.y;
+    m2[2][3] = -Position.z;
+    
+    return (m1 * m2).transpose();
 }
 
 // Processes input received from any keyboard-like input system.
