@@ -5,6 +5,22 @@
 
 #include <matrixlib.hpp>
 
+// clipping window (orthonormal projection)
+#define XW_MIN -1.5f
+#define XW_MAX 1.5f
+#define YW_MIN -1.5f
+#define YW_MAX 1.5f
+#define Zo_NEAR 5.f
+#define Zo_FAR -5.f
+
+// clipping window (perspective projection)
+#define RIGHT 1.f
+#define LEFT 0.f
+#define TOP 1.f
+#define BOTTOM 0.f
+#define Zp_NEAR 5.f
+#define Zp_FAR -5.f
+
 namespace utils{
     //copy file content to outputString
     bool fileToString(char* filePath, std::string &outputString){
@@ -110,5 +126,30 @@ namespace utils{
         return modelMatrix * scaleMatrix;
     }
 
+    ml::matrix<float> orthogonalMatrix(){
+        ml::matrix<float> orthogonal(4, 4, true);
 
+        orthogonal[0][0] = 2.f/(XW_MAX-XW_MIN);
+        orthogonal[0][3] = -(XW_MAX+XW_MIN)/(XW_MAX-XW_MIN);
+        orthogonal[1][1] = 2.f/(YW_MAX-YW_MIN);
+        orthogonal[1][3] = -(YW_MAX+YW_MIN)/(YW_MAX-YW_MIN);
+        orthogonal[2][2] = -2.f/(Zo_NEAR-Zo_FAR);
+        orthogonal[2][3] = (Zo_NEAR+Zo_FAR)/(Zo_NEAR-Zo_FAR);
+
+        return orthogonal;
+    }
+
+    ml::matrix<float> perspectiveMatrix(){
+        ml::matrix<float> perspective(0.f, 4, 4);
+
+        perspective[0][0] = (2.f*Zp_NEAR)/(RIGHT-LEFT);
+        perspective[0][2] = (RIGHT+LEFT)/(RIGHT-LEFT);
+        perspective[1][1] = (2.f*Zp_NEAR)/(TOP-BOTTOM);
+        perspective[1][2] = (TOP+BOTTOM)/(TOP-BOTTOM);
+        perspective[2][2] = -(Zp_NEAR+Zp_FAR)/(Zp_FAR-Zp_NEAR);
+        perspective[2][3] = (-2.f*Zp_NEAR*Zp_FAR)/(Zp_FAR-Zp_NEAR);
+        perspective[3][2] = -1.f;
+
+        return perspective;
+    }
 }

@@ -137,7 +137,7 @@ namespace graphicslib {
         modelCoord.scale[2] = 2.f/size;
 
         float currentFrame;
-        glm::mat4 projection;
+        ml::matrix<float> projection(4, 4);
         glm::mat4 view;
 
         // render loop
@@ -164,14 +164,14 @@ namespace graphicslib {
 
             if(mOrthogonalProjection){
                 //use orthogonal projection
-                projection = glm::ortho(-1.5f, 1.5f, -1.5f, 1.5f, -10.f, 10.f);
+                projection = utils::orthogonalMatrix();
             }else{
                 //use perspective projection
-                projection = glm::perspective(glm::radians(camera.Zoom), (float)mWindowWidth / (float)mWindowHeight, 0.1f, 100.0f);
+                projection = utils::perspectiveMatrix();
             }
             // view/projection transformations
             view = camera.GetViewMatrix();
-            shader.setMat4("projection", projection);
+            shader.setMat4("projection", projection.getMatrix());
             shader.setMat4("view", view);
 
             // apply rotation

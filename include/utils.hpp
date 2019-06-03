@@ -23,7 +23,10 @@ namespace utils{
     //apply scale in the model matrix
     ml::matrix<float> scale(ml::matrix<float> &modelMatrix, float* scale);
     ml::matrix<float> scale(ml::matrix<float> &modelMatrix, ml::matrix<float> &scale);
-
+    //return the orthogonal projection's matrix
+    ml::matrix<float> orthogonalMatrix();
+    //return the perspective projection's matrix
+    ml::matrix<float> perspectiveMatrix();
 }
 
 #endif
