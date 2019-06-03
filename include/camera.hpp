@@ -54,7 +54,7 @@ public:
     // Constructor with scalar values
     Camera(float posX, float posY, float posZ, float upX, float upY, float upZ, float yaw, float pitch);
 
-    // Returns the view matrix calculated using Euler Angles and the LookAt Matrix
+    // Returns the view matrix using the LookAt Matrix
     ml::matrix<float> GetViewMatrix();
 
     // Processes input received from any keyboard-like input system.

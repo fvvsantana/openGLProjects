@@ -22,7 +22,7 @@ Camera::Camera(float posX, float posY, float posZ, float upX, float upY, float u
     updateCameraVectors();
 }
 
-// Returns the view matrix calculated using Euler Angles and the LookAt Matrix
+// Returns the view matrix using the LookAt Matrix
 ml::matrix<float> Camera::GetViewMatrix()
 {
     ml::matrix<float> m1(4, 4, true);
