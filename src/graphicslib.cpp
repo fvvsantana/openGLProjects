@@ -12,8 +12,6 @@
 
 namespace graphicslib {
 
-    void mouseCallback(GLFWwindow* window, double xpos, double ypos);
-    void scrollCallback(GLFWwindow* window, double xoffset, double yoffset);
     // camera
     Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
     float lastX;

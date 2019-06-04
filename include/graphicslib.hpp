@@ -24,6 +24,10 @@ namespace graphicslib {
         float scale[3];
     };
 
+    //responds to mouse movements via callback (argument to glfw)
+    void mouseCallback(GLFWwindow* window, double xpos, double ypos);
+    //responds to scroll input via callback (argument to glfw)
+    void scrollCallback(GLFWwindow* window, double xoffset, double yoffset);
 
     class Window {
     private:
