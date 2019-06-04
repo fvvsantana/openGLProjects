@@ -25,26 +25,26 @@ Camera::Camera(float posX, float posY, float posZ, float upX, float upY, float u
 // Returns the view matrix using the LookAt Matrix
 ml::matrix<float> Camera::GetViewMatrix()
 {
-    ml::matrix<float> m1(4, 4, true);
-    ml::matrix<float> m2(4, 4, true);
+    ml::matrix<float> orientation(4, 4, true);
+    ml::matrix<float> translation(4, 4, true);
 
-    m1[0][0] = Right.x;
-    m1[0][1] = Right.y;
-    m1[0][2] = Right.z;
+    orientation[0][0] = Right.x;
+    orientation[0][1] = Right.y;
+    orientation[0][2] = Right.z;
 
-    m1[1][0] = Up.x;
-    m1[1][1] = Up.y;
-    m1[1][2] = Up.z;
+    orientation[1][0] = Up.x;
+    orientation[1][1] = Up.y;
+    orientation[1][2] = Up.z;
     
-    m1[2][0] = -Front.x;
-    m1[2][1] = -Front.y;
-    m1[2][2] = -Front.z;
+    orientation[2][0] = -Front.x;
+    orientation[2][1] = -Front.y;
+    orientation[2][2] = -Front.z;
 
-    m2[0][3] = -Position.x;
-    m2[1][3] = -Position.y;
-    m2[2][3] = -Position.z;
+    translation[0][3] = -Position.x;
+    translation[1][3] = -Position.y;
+    translation[2][3] = -Position.z;
     
-    return (m1 * m2).transpose();
+    return (orientation * translation).transpose();
 }
 
 // Processes input received from any keyboard-like input system.
