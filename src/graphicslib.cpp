@@ -81,7 +81,6 @@ namespace graphicslib {
         //set callback function to call when resize
         glfwSetFramebufferSizeCallback(mWindow, framebufferResizeCallback);
         glfwSetCursorPosCallback(mWindow, mouseCallback);
-        glfwSetScrollCallback(mWindow, scrollCallback);
 
         // tell GLFW to capture our mouse
         glfwSetInputMode(mWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -268,14 +267,6 @@ namespace graphicslib {
 
         camera.ProcessMouseMovement(xoffset, yoffset);
     }
-
-    // glfw: whenever the mouse scroll wheel scrolls, this callback is called
-    // ----------------------------------------------------------------------
-    void scrollCallback(GLFWwindow* window, double xoffset, double yoffset)
-    {
-        camera.ProcessMouseScroll(yoffset);
-    }
-
 
     void Window::glfwErrorCallback(int error, const char* description) {
     std::cerr << "GLFW error code " << error << ". Description: " << description << std::endl;

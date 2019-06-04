@@ -25,7 +25,6 @@ const float YAW         = -90.0f;
 const float PITCH       =  0.0f;
 const float SPEED       =  2.5f;
 const float SENSITIVITY =  0.1f;
-const float ZOOM        =  45.0f;
 
 
 // An abstract camera class that processes input and calculates the corresponding Euler Angles,
@@ -45,7 +44,6 @@ public:
     // Camera options
     float MovementSpeed;
     float MouseSensitivity;
-    float Zoom;
 
     // Constructor with vectors
     Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f),
@@ -63,9 +61,6 @@ public:
 
     // Processes input received from a mouse input system. Expects the offset value in both the x and y direction.
     void ProcessMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch = true);
-
-    // Processes input received from a mouse scroll-wheel event. Only requires input on the vertical wheel-axis
-    void ProcessMouseScroll(float yoffset);
 
 private:
     // Calculates the front vector from the Camera's (updated) Euler Angles
