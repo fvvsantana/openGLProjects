@@ -2,6 +2,7 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <queue>
 
 #include <graphicslib.hpp>
 #include <utils.hpp>
@@ -9,6 +10,8 @@
 #include <shader.hpp>
 #include <model.hpp>
 #include <camera.hpp>
+
+#define FILE "scene.txt"
 
 namespace graphicslib {
 
@@ -102,36 +105,55 @@ namespace graphicslib {
     }
 
 
-    void Window::run(char *filepath){
+    void Window::run(){
 
+        std::ifstream models(FILE);
+        std::string line;
+        int i = 0;
         // build and compile shaders
         // -------------------------
         Shader shader("src/model.vs", "src/model.fs");
-
         // load models
         // -----------
-        Model model(filepath);
+        // load models
+        // -----------
+        std::vector<float> delta;
+        delta.push_back(0);
+        std::vector<Model> ModelVector;
+        float previousModelSize = 0;
+        while(std::getline(models, line)){
+                
+            Model model(line);
 
-        // calculate the bounding box of the model
-        model.calcBoundingBox();
+            // calculate the bounding box of the model
+            model.calcBoundingBox();
 
-        // size of the biggest dimension of the model
-        float size = model.biggestDimensionSize();
+            // size of the biggest dimension of the model
+            float size = model.biggestDimensionSize();
 
-        // initial position
-        modelCoord.position[0] = -(model.boundingBox.x.center);
-        modelCoord.position[1] = -(model.boundingBox.y.center);
-        modelCoord.position[2] = -(model.boundingBox.z.center);
+            // initial rotation
+            modelCoord.rotation[0] = 0.f;
+            modelCoord.rotation[1] = 0.f;
+            modelCoord.rotation[2] = 0.f;
 
-        // initial rotation
-        modelCoord.rotation[0] = 0.f;
-        modelCoord.rotation[1] = 0.f;
-        modelCoord.rotation[2] = 0.f;
+            // initial scale
+            modelCoord.scale[0] = 2.f/size;
+            modelCoord.scale[1] = 2.f/size;
+            modelCoord.scale[2] = 2.f/size;
 
-        // initial scale
-        modelCoord.scale[0] = 2.f/size;
-        modelCoord.scale[1] = 2.f/size;
-        modelCoord.scale[2] = 2.f/size;
+            modelCoord.position[0] = -(model.boundingBox.x.center);
+            modelCoord.position[1] = -(model.boundingBox.y.center);
+            modelCoord.position[2] = -(model.boundingBox.z.center);
+
+            if(i != 0) {
+                delta.push_back(delta[i - 1] + previousModelSize + modelCoord.scale[0]*model.boundingBox.x.size/2 + 0.25);
+            }
+            previousModelSize = modelCoord.scale[0]*model.boundingBox.x.size/2;
+
+            i++;
+            modelCoordVector.push_back(modelCoord);           
+            ModelVector.push_back(model);                
+        }
 
         float currentFrame;
         ml::matrix<float> projection(4, 4);
@@ -144,7 +166,6 @@ namespace graphicslib {
             currentFrame = glfwGetTime();
             mDeltaTime = currentFrame - mLastFrame;
             mLastFrame = currentFrame;
-
 
             // input
             // -----
@@ -170,27 +191,34 @@ namespace graphicslib {
             ml::matrix<float> view = camera.GetViewMatrix();
             shader.setMat4("view", view.getMatrix());
 
-            // apply rotation
-            ml::matrix<float> modelMatrix(4, 4, true);
-            modelMatrix = utils::rotateX(modelMatrix, modelCoord.rotation[0]);
-            modelMatrix = utils::rotateY(modelMatrix, modelCoord.rotation[1]);
-            modelMatrix = utils::rotateZ(modelMatrix, modelCoord.rotation[2]);
 
-            // apply scale
-            modelMatrix = utils::scale(modelMatrix, modelCoord.scale);
-
-            // apply translation
-            modelMatrix = utils::translate(modelMatrix, modelCoord.position);
-
-            //transpose the matrix
-            modelMatrix = modelMatrix.transpose();
-
-            //pass the model matrix to the shader
-            shader.setMat4("model", modelMatrix.getMatrix());
-
+            i = 0;
             // render the loaded model
-            model.Draw(shader);
+            for(auto model : ModelVector){
+                ml::matrix<float> modelMatrix(4, 4, true);
+                float tmp[3] = {delta[i], 0, 0};
+                modelMatrix = utils::translate(modelMatrix, tmp);
+                // apply rotation
+                modelMatrix = utils::rotateX(modelMatrix, modelCoordVector[i].rotation[0]);
+                modelMatrix = utils::rotateY(modelMatrix, modelCoordVector[i].rotation[1]);
+                modelMatrix = utils::rotateZ(modelMatrix, modelCoordVector[i].rotation[2]);
 
+                // apply scale
+                modelMatrix = utils::scale(modelMatrix, modelCoordVector[i].scale);
+
+                // apply translation
+                modelMatrix = utils::translate(modelMatrix, modelCoordVector[i].position);
+
+
+                //transpose the matrix
+                modelMatrix = modelMatrix.transpose();
+
+                //pass the model matrix to the shader
+                shader.setMat4("model", modelMatrix.getMatrix());
+                model.Draw(shader);
+
+                i++;
+            }         
 
             // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
             // -------------------------------------------------------------------------------

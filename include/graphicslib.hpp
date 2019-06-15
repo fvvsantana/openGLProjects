@@ -5,6 +5,8 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#include <vector>
+
 
 namespace ml{
     template<class T>
@@ -35,6 +37,7 @@ namespace graphicslib {
         GLuint mCoreProgram;
 
         ModelCoordinates modelCoord;
+        std::vector<ModelCoordinates> modelCoordVector;
 
         // perspective type
         bool mOrthogonalProjection;
@@ -64,7 +67,7 @@ namespace graphicslib {
         void createWindow();
 
         //main loop
-        void run(char *filepath);
+        void run();
     };
 }
 

@@ -13,8 +13,7 @@
 int main(int argc, char *argv[]) {
     graphicslib::Window window(WINDOW_WIDTH, WINDOW_HEIGHT);
     window.createWindow();
-    std::cout << argv[1] << std::endl;
-    window.run(argv[1]);
+    window.run();
 
     return 0;
 }
