@@ -5,7 +5,7 @@
 
 #include <matrixlib.hpp>
 
-// orthographic box
+// orthographic volume
 #define XW_MIN -1.5f
 #define XW_MAX 1.5f
 #define YW_MIN -1.5f
