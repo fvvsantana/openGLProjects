@@ -2,7 +2,6 @@
 #include <fstream>
 #include <string>
 #include <vector>
-#include <queue>
 
 #include <graphicslib.hpp>
 #include <utils.hpp>
@@ -107,21 +106,17 @@ namespace graphicslib {
 
     void Window::run(){
 
-        std::ifstream models(FILE);
+        std::ifstream modelsFile(FILE);
         std::string line;
         int i = 0;
         // build and compile shaders
-        // -------------------------
         Shader shader("src/model.vs", "src/model.fs");
-        // load models
-        // -----------
-        // load models
-        // -----------
         std::vector<float> delta;
         delta.push_back(0);
-        std::vector<Model> ModelVector;
+        std::vector<Model> models;
         float previousModelSize = 0;
-        while(std::getline(models, line)){
+        // load models
+        while(std::getline(modelsFile, line)){
                 
             Model model(line);
 
@@ -152,7 +147,7 @@ namespace graphicslib {
 
             i++;
             modelCoordVector.push_back(modelCoord);           
-            ModelVector.push_back(model);                
+            models.push_back(model);                
         }
 
         float currentFrame;
@@ -194,7 +189,7 @@ namespace graphicslib {
 
             i = 0;
             // render the loaded model
-            for(auto model : ModelVector){
+            for(auto model : models){
                 ml::matrix<float> modelMatrix(4, 4, true);
                 float tmp[3] = {delta[i], 0, 0};
                 modelMatrix = utils::translate(modelMatrix, tmp);
