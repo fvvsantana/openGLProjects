@@ -37,6 +37,7 @@ namespace graphicslib {
         GLuint mCoreProgram;
 
         ModelCoordinates modelCoord;
+        //vector used to store the initial position of multiple models
         std::vector<ModelCoordinates> modelCoordVector;
 
         // perspective type

@@ -111,9 +111,14 @@ namespace graphicslib {
         int i = 0;
         // build and compile shaders
         Shader shader("src/model.vs", "src/model.fs");
+
+        //delta is the distance between the origin of the coordinate system and the center of the i model
         std::vector<float> delta;
         delta.push_back(0);
+
         std::vector<Model> models;
+        //previousModelSize is the half the x-axis size of the model on the left of the current model
+        //it is used to obtain the delta value for the current model
         float previousModelSize = 0;
         // load models
         while(std::getline(modelsFile, line)){
@@ -140,6 +145,8 @@ namespace graphicslib {
             modelCoord.position[1] = -(model.boundingBox.y.center);
             modelCoord.position[2] = -(model.boundingBox.z.center);
 
+            //to set the delta distance, we need the delta of the previous model, half of its size, half of the 
+            //size of the current model and a constant value (so the models won't be rendered too close to each other)
             if(i != 0) {
                 delta.push_back(delta[i - 1] + previousModelSize + modelCoord.scale[0]*model.boundingBox.x.size/2 + 0.25);
             }
@@ -154,24 +161,20 @@ namespace graphicslib {
         ml::matrix<float> projection(4, 4);
 
         // render loop
-        // -----------
         while(!glfwWindowShouldClose(mWindow)){
             // per-frame time logic
-            // --------------------
             currentFrame = glfwGetTime();
             mDeltaTime = currentFrame - mLastFrame;
             mLastFrame = currentFrame;
 
             // input
-            // -----
             updateInput(mWindow);
 
             // render
-            // ------
             glClearColor(0.05f, 0.05f, 0.05f, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-            // don't forget to enable shader before setting uniforms
+            //enable shader
             shader.use();
 
             if(mOrthogonalProjection){
@@ -181,18 +184,22 @@ namespace graphicslib {
                 //use perspective projection
                 projection = utils::perspectiveMatrix();
             }
+
             // view/projection transformations
             shader.setMat4("projection", projection.getMatrix());
             ml::matrix<float> view = camera.GetViewMatrix();
             shader.setMat4("view", view.getMatrix());
 
-
             i = 0;
-            // render the loaded model
+            // render the loaded models
             for(auto model : models){
+
+                //translate the current model to the side of the previous model
                 ml::matrix<float> modelMatrix(4, 4, true);
+                //tmp is the array used to translate the model using its assigned delta value
                 float tmp[3] = {delta[i], 0, 0};
                 modelMatrix = utils::translate(modelMatrix, tmp);
+
                 // apply rotation
                 modelMatrix = utils::rotateX(modelMatrix, modelCoordVector[i].rotation[0]);
                 modelMatrix = utils::rotateY(modelMatrix, modelCoordVector[i].rotation[1]);
@@ -201,7 +208,7 @@ namespace graphicslib {
                 // apply scale
                 modelMatrix = utils::scale(modelMatrix, modelCoordVector[i].scale);
 
-                // apply translation
+                // apply translation to the origin
                 modelMatrix = utils::translate(modelMatrix, modelCoordVector[i].position);
 
 
@@ -216,7 +223,6 @@ namespace graphicslib {
             }         
 
             // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
-            // -------------------------------------------------------------------------------
             glfwSwapBuffers(mWindow);
             glfwPollEvents();
         }
@@ -272,7 +278,6 @@ namespace graphicslib {
     }
 
     // glfw: whenever the mouse moves, this callback is called
-    // -------------------------------------------------------
     void mouseCallback(GLFWwindow* window, double xpos, double ypos)
     {
         if (firstMouse)
@@ -283,7 +288,8 @@ namespace graphicslib {
         }
 
         float xoffset = xpos - lastX;
-        float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
+        // yoffset reversed since y-coordinates go from bottom to top
+        float yoffset = lastY - ypos; 
 
         lastX = xpos;
         lastY = ypos;
