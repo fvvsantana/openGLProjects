@@ -5,7 +5,7 @@
 
 #include <matrixlib.hpp>
 
-// clipping window (orthonormal projection)
+// orthographic box
 #define XW_MIN -1.5f
 #define XW_MAX 1.5f
 #define YW_MIN -1.5f
@@ -13,7 +13,7 @@
 #define Zo_NEAR 5.f
 #define Zo_FAR -5.f
 
-// clipping window (perspective projection)
+// perspective frustum
 #define RIGHT 1.f
 #define LEFT 0.f
 #define TOP 1.f
