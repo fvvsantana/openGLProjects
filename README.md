@@ -24,7 +24,9 @@ Para outras distribuições, instale a partir do código fonte:
 Para executar o projeto siga as instruções:
 
 Baixe o repositório.
+
 Crie um arquivo 'scene.txt' na raiz do projeto com cada modelo a ser carregado na aplicação em uma linha.
+
 Crie a pasta build na raiz do projeto:
 ```
     mkdir build && cd build
