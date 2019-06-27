@@ -12,6 +12,9 @@
 
 #define FILE "scene.txt"
 
+#include <glm/gtc/type_ptr.hpp>
+
+
 namespace graphicslib {
 
     // camera
@@ -19,6 +22,9 @@ namespace graphicslib {
     float lastX;
     float lastY;
     float firstMouse = true;
+
+    // lighting
+    glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 
     //initialize glfw stuff
     Window::Window(int windowWidth, int windowHeight){
@@ -101,10 +107,15 @@ namespace graphicslib {
         //make possible using 3d
         glEnable(GL_DEPTH_TEST);
 
+        //allow us to change the size of a point
+        glEnable(GL_PROGRAM_POINT_SIZE);
+
     }
 
 
     void Window::run(){
+
+        /*
 
         std::ifstream modelsFile(FILE);
         std::string line;
@@ -159,6 +170,97 @@ namespace graphicslib {
 
         float currentFrame;
         ml::matrix<float> projection(4, 4);
+        */
+
+        // build and compile our shader zprogram
+            // ------------------------------------
+        Shader lightingShader("src/2.2.basic_lighting.vs", "src/2.2.basic_lighting.fs");
+        Shader lampShader("src/2.2.lamp.vs", "src/2.2.lamp.fs");
+
+        // set up vertex data (and buffer(s)) and configure vertex attributes
+        // ------------------------------------------------------------------
+        float vertices[] = {
+        -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+         0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+         0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+         0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+
+        -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+         0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+         0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+         0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+
+        -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+        -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+        -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+        -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+        -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+        -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+
+         0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+         0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+         0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+         0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+         0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+
+        -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+         0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+         0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+         0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+
+        -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
+         0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
+         0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+         0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
+        };
+
+        // configure the cube's VAO (and VBO)
+        unsigned int VBO, cubeVAO;
+        glGenVertexArrays(1, &cubeVAO);
+        glGenBuffers(1, &VBO);
+
+        glBindBuffer(GL_ARRAY_BUFFER, VBO);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+        glBindVertexArray(cubeVAO);
+
+        // position attribute
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+        glEnableVertexAttribArray(0);
+        // normal attribute
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+        glEnableVertexAttribArray(1);
+
+        float lightPoint[] = {
+            1.0f, 1.0f, 1.0f
+        };
+
+        // configure the lightPoint's VAO (and VBO)
+        unsigned int lightPointVBO, lightPointVAO;
+        glGenVertexArrays(1, &lightPointVAO);
+        glGenBuffers(1, &lightPointVBO);
+
+        glBindBuffer(GL_ARRAY_BUFFER, lightPointVBO);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(lightPoint), lightPoint, GL_STATIC_DRAW);
+
+        glBindVertexArray(lightPointVAO);
+
+        // position attribute
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+        glEnableVertexAttribArray(0);
+
+
+        float currentFrame;
+        ml::matrix<float> projection(4, 4);
 
         // render loop
         while(!glfwWindowShouldClose(mWindow)){
@@ -173,7 +275,51 @@ namespace graphicslib {
             // render
             glClearColor(0.05f, 0.05f, 0.05f, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            // be sure to activate shader when setting uniforms/drawing objects
+            lightingShader.use();
+            lightingShader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
+            lightingShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
+            lightingShader.setVec3("lightPos", glm::make_vec3(lightPoint));
+            lightingShader.setVec3("viewPos", camera.Position);
 
+            if(mOrthogonalProjection){
+                //use orthogonal projection
+                projection = utils::orthogonalMatrix();
+            }else{
+                //use perspective projection
+                projection = utils::perspectiveMatrix();
+            }
+
+            // view/projection transformations
+
+            // view/projection transformations
+            lightingShader.setMat4("projection", projection.getMatrix());
+            ml::matrix<float> view = camera.GetViewMatrix();
+            lightingShader.setMat4("view", view.getMatrix());
+
+            // world transformation
+            glm::mat4 model = glm::mat4(1.0f);
+            lightingShader.setMat4("model", model);
+
+            // render the cube
+            glBindVertexArray(cubeVAO);
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+
+
+
+            //draw the lightPoint
+            lampShader.use();
+            // view/projection transformations
+            lampShader.setMat4("projection", projection.getMatrix());
+            view = camera.GetViewMatrix();
+            lampShader.setMat4("view", view.getMatrix());
+            model = glm::mat4(1.0f);
+            lampShader.setMat4("model", model);
+
+            glBindVertexArray(lightPointVAO);
+            glDrawArrays(GL_POINTS, 0, 1);
+
+            /*
             //enable shader
             shader.use();
 
@@ -221,6 +367,7 @@ namespace graphicslib {
 
                 i++;
             }         
+            */
 
             // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
             glfwSwapBuffers(mWindow);
