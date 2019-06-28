@@ -41,7 +41,7 @@ namespace graphicslib {
         std::vector<ModelCoordinates> modelCoordVector;
 
         // perspective type
-        bool mOrthogonalProjection;
+        bool mPhong;
         bool mPReleased;
 
         // timing

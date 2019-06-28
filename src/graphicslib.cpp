@@ -50,7 +50,7 @@ namespace graphicslib {
         lastX = windowWidth/2.0f;
         lastY = windowHeight/2.0f;
 
-        mOrthogonalProjection = true;
+        mPhong = true;
         mPReleased = true;
 
         // timing
@@ -175,6 +175,7 @@ namespace graphicslib {
         // build and compile our shader zprogram
             // ------------------------------------
         Shader phongShader("src/phong.vs", "src/phong.fs");
+        Shader gouraudShader("src/gouraud.vs", "src/gouraud.fs");
         Shader lampShader("src/lamp.vs", "src/lamp.fs");
 
         // set up vertex data (and buffer(s)) and configure vertex attributes
@@ -241,7 +242,9 @@ namespace graphicslib {
         glEnableVertexAttribArray(1);
 
         float lightPoint[] = {
-            0.3f, 0.3f, 1.f
+            //0.3f, 0.3f, 1.f
+            //0.75f, 0.75f, 0.75f
+            0.75f, 0.75f, 0.75f
         };
 
         // configure the lightPoint's VAO (and VBO)
@@ -278,21 +281,42 @@ namespace graphicslib {
             glClearColor(0.05f, 0.05f, 0.05f, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-            // be sure to activate shader when setting uniforms/drawing objects
-            phongShader.use();
-            phongShader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
-            phongShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
-            phongShader.setVec3("lightPos", glm::make_vec3(lightPoint));
-            phongShader.setVec3("viewPos", camera.Position);
+            //use the phong shader
+            if(mPhong){
+                // be sure to activate shader when setting uniforms/drawing objects
+                phongShader.use();
+                phongShader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
+                phongShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
+                phongShader.setVec3("lightPos", glm::make_vec3(lightPoint));
+                phongShader.setVec3("viewPos", camera.Position);
+
+                // view/projection transformations
+                projection = utils::perspectiveMatrix();
+                phongShader.setMat4("projection", projection.getMatrix());
+                view = camera.GetViewMatrix();
+                phongShader.setMat4("view", view.getMatrix());
+                modelMatrix = modelMatrix.transpose();
+                phongShader.setMat4("model", modelMatrix.getMatrix());
+            //use the gouraud shader
+            }else{
+                // be sure to activate shader when setting uniforms/drawing objects
+                gouraudShader.use();
+                gouraudShader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
+                gouraudShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
+                gouraudShader.setVec3("lightPos", glm::make_vec3(lightPoint));
+                gouraudShader.setVec3("viewPos", camera.Position);
+
+                // view/projection transformations
+                projection = utils::perspectiveMatrix();
+                gouraudShader.setMat4("projection", projection.getMatrix());
+                view = camera.GetViewMatrix();
+                gouraudShader.setMat4("view", view.getMatrix());
+                modelMatrix = modelMatrix.transpose();
+                gouraudShader.setMat4("model", modelMatrix.getMatrix());
+
+            }
 
 
-            // view/projection transformations
-            projection = utils::perspectiveMatrix();
-            phongShader.setMat4("projection", projection.getMatrix());
-            view = camera.GetViewMatrix();
-            phongShader.setMat4("view", view.getMatrix());
-            modelMatrix = modelMatrix.transpose();
-            phongShader.setMat4("model", modelMatrix.getMatrix());
 
             // render the cube
             glBindVertexArray(cubeVAO);
@@ -404,12 +428,12 @@ namespace graphicslib {
         }
 
         if(mPReleased){
-            if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS){
-                mOrthogonalProjection = !mOrthogonalProjection;
+            if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS){
+                mPhong = !mPhong;
             }
             mPReleased = false;
         }
-        if (glfwGetKey(window, GLFW_KEY_P) == GLFW_RELEASE){
+        if (glfwGetKey(window, GLFW_KEY_L) == GLFW_RELEASE){
             mPReleased = true;
         }
 
