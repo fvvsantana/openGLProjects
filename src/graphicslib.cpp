@@ -174,8 +174,8 @@ namespace graphicslib {
 
         // build and compile our shader zprogram
             // ------------------------------------
-        Shader lightingShader("src/2.2.basic_lighting.vs", "src/2.2.basic_lighting.fs");
-        Shader lampShader("src/2.2.lamp.vs", "src/2.2.lamp.fs");
+        Shader phongShader("src/phong.vs", "src/phong.fs");
+        Shader lampShader("src/lamp.vs", "src/lamp.fs");
 
         // set up vertex data (and buffer(s)) and configure vertex attributes
         // ------------------------------------------------------------------
@@ -241,7 +241,7 @@ namespace graphicslib {
         glEnableVertexAttribArray(1);
 
         float lightPoint[] = {
-            1.0f, 1.0f, 1.0f
+            0.3f, 0.3f, 1.f
         };
 
         // configure the lightPoint's VAO (and VBO)
@@ -261,6 +261,8 @@ namespace graphicslib {
 
         float currentFrame;
         ml::matrix<float> projection(4, 4);
+        ml::matrix<float> view(4, 4);
+        ml::matrix<float> modelMatrix(4, 4, true);
 
         // render loop
         while(!glfwWindowShouldClose(mWindow)){
@@ -275,31 +277,22 @@ namespace graphicslib {
             // render
             glClearColor(0.05f, 0.05f, 0.05f, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
             // be sure to activate shader when setting uniforms/drawing objects
-            lightingShader.use();
-            lightingShader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
-            lightingShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
-            lightingShader.setVec3("lightPos", glm::make_vec3(lightPoint));
-            lightingShader.setVec3("viewPos", camera.Position);
+            phongShader.use();
+            phongShader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
+            phongShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
+            phongShader.setVec3("lightPos", glm::make_vec3(lightPoint));
+            phongShader.setVec3("viewPos", camera.Position);
 
-            if(mOrthogonalProjection){
-                //use orthogonal projection
-                projection = utils::orthogonalMatrix();
-            }else{
-                //use perspective projection
-                projection = utils::perspectiveMatrix();
-            }
 
             // view/projection transformations
-
-            // view/projection transformations
-            lightingShader.setMat4("projection", projection.getMatrix());
-            ml::matrix<float> view = camera.GetViewMatrix();
-            lightingShader.setMat4("view", view.getMatrix());
-
-            // world transformation
-            glm::mat4 model = glm::mat4(1.0f);
-            lightingShader.setMat4("model", model);
+            projection = utils::perspectiveMatrix();
+            phongShader.setMat4("projection", projection.getMatrix());
+            view = camera.GetViewMatrix();
+            phongShader.setMat4("view", view.getMatrix());
+            modelMatrix = modelMatrix.transpose();
+            phongShader.setMat4("model", modelMatrix.getMatrix());
 
             // render the cube
             glBindVertexArray(cubeVAO);
@@ -307,15 +300,13 @@ namespace graphicslib {
 
 
 
-            //draw the lightPoint
             lampShader.use();
             // view/projection transformations
             lampShader.setMat4("projection", projection.getMatrix());
-            view = camera.GetViewMatrix();
             lampShader.setMat4("view", view.getMatrix());
-            model = glm::mat4(1.0f);
-            lampShader.setMat4("model", model);
+            lampShader.setMat4("model", modelMatrix.getMatrix());
 
+            //draw the lightPoint
             glBindVertexArray(lightPointVAO);
             glDrawArrays(GL_POINTS, 0, 1);
 
