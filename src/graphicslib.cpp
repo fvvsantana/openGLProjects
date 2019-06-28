@@ -114,10 +114,34 @@ namespace graphicslib {
 
 
     void Window::run(){
-
         /*
+        std::ifstream sceneFile(FILE);
+        std::string line;
+        std::string word;
+        std::string firstWord;
 
-        std::ifstream modelsFile(FILE);
+
+        //read a line of the file
+        while(std::getline(sceneFile, line)){
+            //read the first word of the line
+            std::istringstream lineStream(line);
+            lineStream >> firstWord;
+
+            //if it's setting the camera
+            if(firstWord.compare("camera") == 0){
+                while(lineStream >> word){
+                    std::cout << word << std::endl;
+                }
+            }
+
+        }
+        */
+
+
+//#define SHOW_MODELS
+
+#ifdef SHOW_MODELS
+        std::ifstream sceneFile(FILE);
         std::string line;
         int i = 0;
         // build and compile shaders
@@ -132,7 +156,7 @@ namespace graphicslib {
         //it is used to obtain the delta value for the current model
         float previousModelSize = 0;
         // load models
-        while(std::getline(modelsFile, line)){
+        while(std::getline(sceneFile, line)){
                 
             Model model(line);
 
@@ -168,9 +192,8 @@ namespace graphicslib {
             models.push_back(model);                
         }
 
-        float currentFrame;
-        ml::matrix<float> projection(4, 4);
-        */
+#endif
+        //////////////////////////////////////////////////////
 
         // build and compile our shader zprogram
             // ------------------------------------
@@ -334,21 +357,19 @@ namespace graphicslib {
             glBindVertexArray(lightPointVAO);
             glDrawArrays(GL_POINTS, 0, 1);
 
-            /*
+
+            //////////////////////////////////////////////////////////////////////
+
+#ifdef SHOW_MODELS
             //enable shader
             shader.use();
 
-            if(mOrthogonalProjection){
-                //use orthogonal projection
-                projection = utils::orthogonalMatrix();
-            }else{
-                //use perspective projection
-                projection = utils::perspectiveMatrix();
-            }
+            //use perspective projection
+            projection = utils::perspectiveMatrix();
 
             // view/projection transformations
             shader.setMat4("projection", projection.getMatrix());
-            ml::matrix<float> view = camera.GetViewMatrix();
+            view = camera.GetViewMatrix();
             shader.setMat4("view", view.getMatrix());
 
             i = 0;
@@ -382,7 +403,8 @@ namespace graphicslib {
 
                 i++;
             }         
-            */
+            /////////////////////////////////////////////
+#endif
 
             // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
             glfwSwapBuffers(mWindow);
