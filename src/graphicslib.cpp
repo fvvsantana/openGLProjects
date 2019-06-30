@@ -178,6 +178,10 @@ namespace graphicslib {
 
 
         std::ifstream sceneFile(FILE);
+        if(!sceneFile){
+            std::cerr << "*** Error while opening file " << FILE << " ***" << std::endl;
+            exit(EXIT_FAILURE);
+        }
         std::string line;
         std::string firstWord;
 
