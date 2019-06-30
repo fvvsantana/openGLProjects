@@ -10,9 +10,10 @@
 #include <model.hpp>
 #include <camera.hpp>
 
-#define FILE "scene.txt"
-
 #include <glm/gtc/type_ptr.hpp>
+
+
+#define FILE "scene.txt"
 
 
 namespace graphicslib {
@@ -114,28 +115,6 @@ namespace graphicslib {
 
 
     void Window::run(){
-        /*
-        std::ifstream sceneFile(FILE);
-        std::string line;
-        std::string word;
-        std::string firstWord;
-
-
-        //read a line of the file
-        while(std::getline(sceneFile, line)){
-            //read the first word of the line
-            std::istringstream lineStream(line);
-            lineStream >> firstWord;
-
-            //if it's setting the camera
-            if(firstWord.compare("camera") == 0){
-                while(lineStream >> word){
-                    std::cout << word << std::endl;
-                }
-            }
-
-        }
-        */
 
 
 //#define SHOW_MODELS
@@ -195,6 +174,69 @@ namespace graphicslib {
 #endif
         //////////////////////////////////////////////////////
 
+
+
+
+        std::ifstream sceneFile(FILE);
+        std::string line;
+        std::string firstWord;
+
+        char auxString[20];
+        //std::string auxString;
+
+        //initialize the number of lights
+        lightingInformation.numberOfPointLights = 0;
+        //read a line of the file
+        while(std::getline(sceneFile, line)){
+            //treat the case of having \n in the end of the file
+            if(line.compare("") == 0){
+                continue;
+            }
+
+            //read the first word of the line
+            std::istringstream lineStream(line);
+            lineStream >> firstWord;
+
+            //if it's adding a light in the scene
+            if(firstWord.compare("light") == 0){
+                //get the point light to alter
+                int index = lightingInformation.numberOfPointLights;
+                PointLight* currentPointLight = &lightingInformation.pointLights[index];
+
+                //read and store the information in the point light
+                sscanf(lineStream.str().c_str(), "%s  %f %f %f  %f %f %f  %f %f %f",
+                       auxString,
+                       &(currentPointLight->position[0]),
+                       &(currentPointLight->position[1]),
+                       &(currentPointLight->position[2]),
+                       &(currentPointLight->ambient[0]),
+                       &(currentPointLight->ambient[1]),
+                       &(currentPointLight->ambient[2]),
+                       &(currentPointLight->linear),
+                       &(currentPointLight->constant),
+                       &(currentPointLight->quadratic));
+                currentPointLight->diffuse = currentPointLight->ambient;
+                currentPointLight->specular = currentPointLight->ambient;
+
+
+                //also alter the point light for buffer
+                PointLightForBuffer* currentPointLightForBuffer = &lightingInformation.bufferOfPointLights[index];
+                currentPointLightForBuffer->position = currentPointLight->position;
+                currentPointLightForBuffer->color = currentPointLight->ambient;
+
+                //increment the number of point lights
+                lightingInformation.numberOfPointLights++;
+                /*
+                while(lineStream >> word){
+                    std::cout << word << std::endl;
+                }
+                */
+            }
+
+        }
+
+
+
         // build and compile our shader zprogram
             // ------------------------------------
         Shader phongShader("src/phong.vs", "src/phong.fs");
@@ -202,27 +244,17 @@ namespace graphicslib {
         Shader lampShader("src/lamp.vs", "src/lamp.fs");
 
 
-        float lightPoint[] = {
-            //0.3f, 0.3f, 1.f
-            //0.75f, 0.75f, 0.75f
-            0.75f, 0.75f, 0.75f
-        };
-
-        // configure the lightPoint's VAO (and VBO)
-        unsigned int lightPointVBO, lightPointVAO;
-        glGenVertexArrays(1, &lightPointVAO);
-        glGenBuffers(1, &lightPointVBO);
-
-        glBindBuffer(GL_ARRAY_BUFFER, lightPointVBO);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(lightPoint), lightPoint, GL_STATIC_DRAW);
-
-        glBindVertexArray(lightPointVAO);
-
-        // position attribute
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-        glEnableVertexAttribArray(0);
+        glm::vec3 auxLightPosition(0.75f, 0.75f, 0.75f);
 
 
+
+        //load the point lights VAO (buffer already filled)
+        unsigned int pointLightsVAO = loadPointLightsVAO();
+
+
+
+
+        //load the cube
         unsigned int cubeVAO = loadCubeVAO();
 
         float currentFrame;
@@ -250,7 +282,7 @@ namespace graphicslib {
                 phongShader.use();
                 phongShader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
                 phongShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
-                phongShader.setVec3("lightPos", glm::make_vec3(lightPoint));
+                phongShader.setVec3("lightPos", auxLightPosition);
                 phongShader.setVec3("viewPos", camera.Position);
 
                 // view/projection transformations
@@ -266,7 +298,7 @@ namespace graphicslib {
                 gouraudShader.use();
                 gouraudShader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
                 gouraudShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
-                gouraudShader.setVec3("lightPos", glm::make_vec3(lightPoint));
+                gouraudShader.setVec3("lightPos", auxLightPosition);
                 gouraudShader.setVec3("viewPos", camera.Position);
 
                 // view/projection transformations
@@ -293,9 +325,9 @@ namespace graphicslib {
             lampShader.setMat4("view", view.getMatrix());
             lampShader.setMat4("model", modelMatrix.getMatrix());
 
-            //draw the lightPoint
-            glBindVertexArray(lightPointVAO);
-            glDrawArrays(GL_POINTS, 0, 1);
+            //draw the pointLight
+            glBindVertexArray(pointLightsVAO);
+            glDrawArrays(GL_POINTS, 0, lightingInformation.numberOfPointLights);
 
 
             //////////////////////////////////////////////////////////////////////
@@ -376,6 +408,31 @@ namespace graphicslib {
         glEnableVertexAttribArray(1);
 
         return cubeVAO;
+    }
+
+    //gen and setup a VAO to the point lights and fill it's buffer
+    unsigned int Window::loadPointLightsVAO(){
+
+        //generate the VAO
+        unsigned int pointLightsVBO, pointLightsVAO;
+        glGenVertexArrays(1, &pointLightsVAO);
+
+        //fill the buffer with the light points
+        glGenBuffers(1, &pointLightsVBO);
+        glBindBuffer(GL_ARRAY_BUFFER, pointLightsVBO);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(PointLightForBuffer) * lightingInformation.numberOfPointLights,
+                     lightingInformation.bufferOfPointLights, GL_STATIC_DRAW);
+
+        //setup the VAO attributes
+        glBindVertexArray(pointLightsVAO);
+        // position attribute
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(PointLightForBuffer), (void*)0);
+        glEnableVertexAttribArray(0);
+        // color attribute
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(PointLightForBuffer), (void*)(3 * sizeof(float)));
+        glEnableVertexAttribArray(1);
+
+        return pointLightsVAO;
     }
 
     //callback function to execute when the window is resized
