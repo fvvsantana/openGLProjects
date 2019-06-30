@@ -1,11 +1,12 @@
 #ifndef GRAPHICSLIB_HPP
 #define GRAPHICSLIB_HPP
 
-
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-
+#include <glm/gtc/type_ptr.hpp>
 #include <vector>
+
+#define MAX_LIGHT_NUMBER 100
 
 
 namespace ml{
@@ -24,6 +25,43 @@ namespace graphicslib {
         float position[3];
         float rotation[3];
         float scale[3];
+    };
+
+
+    //point light structure for the rendering of the lights
+    struct PointLightForBuffer{
+        //light position
+        glm::vec3 position;
+        //light color
+        glm::vec3 color;
+    };
+
+
+    //point light structure that holds all the information about the point light
+    struct PointLight {
+        //light position
+        glm::vec3 position;
+
+        //light attenuation
+        float constant;
+        float linear;
+        float quadratic;
+
+        //light components
+        glm::vec3 ambient;
+        glm::vec3 diffuse;
+        glm::vec3 specular;
+    };
+
+    //All the light information in the scene
+    struct LightingInformation{
+        //array of point lights for rendering
+        PointLightForBuffer bufferOfPointLights[MAX_LIGHT_NUMBER];
+        //array of point lights that holds all the information
+        PointLight pointLights[MAX_LIGHT_NUMBER];
+
+        //number of point lights in the scene
+        int numberOfPointLights;
     };
 
     //responds to mouse movements via callback (argument to glfw)
