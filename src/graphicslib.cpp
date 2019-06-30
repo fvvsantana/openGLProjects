@@ -286,7 +286,7 @@ namespace graphicslib {
                 phongShader.setVec3("viewPos", camera.Position);
 
                 // view/projection transformations
-                projection = utils::perspectiveMatrix();
+                projection = utils::perspectiveMatrix(0.f, 1.f, 0.f, 1.f, 5.f, -5.f);
                 phongShader.setMat4("projection", projection.getMatrix());
                 view = camera.GetViewMatrix();
                 phongShader.setMat4("view", view.getMatrix());
@@ -302,7 +302,7 @@ namespace graphicslib {
                 gouraudShader.setVec3("viewPos", camera.Position);
 
                 // view/projection transformations
-                projection = utils::perspectiveMatrix();
+                projection = utils::perspectiveMatrix(0.f, 1.f, 0.f, 1.f, 5.f, -5.f);
                 gouraudShader.setMat4("projection", projection.getMatrix());
                 view = camera.GetViewMatrix();
                 gouraudShader.setMat4("view", view.getMatrix());

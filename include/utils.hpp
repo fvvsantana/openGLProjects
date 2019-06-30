@@ -24,9 +24,9 @@ namespace utils{
     ml::matrix<float> scale(ml::matrix<float> &modelMatrix, float* scale);
     ml::matrix<float> scale(ml::matrix<float> &modelMatrix, ml::matrix<float> &scale);
     //return the orthogonal projection's matrix
-    ml::matrix<float> orthogonalMatrix();
+    ml::matrix<float> orthogonalMatrix(float xw_max, float xw_min, float yw_max, float yw_min, float z_near, float z_far);
     //return the perspective projection's matrix
-    ml::matrix<float> perspectiveMatrix();
+    ml::matrix<float> perspectiveMatrix(float left, float right, float bottom, float top, float near, float far);
 }
 
 #endif
