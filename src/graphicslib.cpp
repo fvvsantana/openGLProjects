@@ -363,7 +363,7 @@ namespace graphicslib {
             shader.use();
 
             //use perspective projection
-            projection = utils::perspectiveMatrix();
+            projection = utils::perspectiveMatrix(0.f, 1.f, 0.f, 1.f, 5.f, -5.f);
 
             // view/projection transformations
             shader.setMat4("projection", projection.getMatrix());
