@@ -3,8 +3,8 @@ resources/objects/rock/rock.obj
 resources/objects/planet/planet.obj
 resources/objects/nanosuit/nanosuit.obj
 
-light 0.75 0.75 0.75  1.0 1.0 1.0  0.0 0.5 0.0
-light -0.75 -0.75 0.75  1.0 1.0 1.0  0.0 0.5 0.0
-light -0.75 0.75 0.75  1.0 1.0 1.0  0.0 0.5 0.0
-//light 0.75 0.5
+light 0.75 0.75 0.75  1.0 1.0 1.0  0.0 0.1 0.0
+light 0 0.5 0.75  1.0 1.0 1.0  0.0 0.1 0.0
+//light -0.75 -0.75 0.75  1.0 1.0 1.0  0.0 0.1 0.0
+//light -0.75 0.75 0.75  1.0 1.0 1.0  0.0 0.1 0.0
 

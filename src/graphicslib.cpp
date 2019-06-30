@@ -239,7 +239,7 @@ namespace graphicslib {
 
         // build and compile our shader zprogram
             // ------------------------------------
-        Shader phongShader("src/phong.vs", "src/phong.fs");
+        Shader phongShader("src/multipleLightsPhong.vs", "src/multipleLightsPhong.fs");
         Shader gouraudShader("src/gouraud.vs", "src/gouraud.fs");
         Shader lampShader("src/lamp.vs", "src/lamp.fs");
 
@@ -251,9 +251,6 @@ namespace graphicslib {
         //load the point lights VAO (buffer already filled)
         unsigned int pointLightsVAO = loadPointLightsVAO();
 
-
-
-
         //load the cube
         unsigned int cubeVAO = loadCubeVAO();
 
@@ -261,6 +258,15 @@ namespace graphicslib {
         ml::matrix<float> projection(4, 4);
         ml::matrix<float> view(4, 4);
         ml::matrix<float> modelMatrix(4, 4, true);
+
+        //set phong shader material properties
+        phongShader.use();
+        phongShader.setInt("material.diffuse", 0);
+        phongShader.setInt("material.specular", 1);
+        phongShader.setFloat("material.shininess", 32.0f);
+
+        //send the number of point lights
+        phongShader.setInt("numberOfPointLights", lightingInformation.numberOfPointLights);
 
         // render loop
         while(!glfwWindowShouldClose(mWindow)){
@@ -280,18 +286,38 @@ namespace graphicslib {
             if(mPhong){
                 // be sure to activate shader when setting uniforms/drawing objects
                 phongShader.use();
-                phongShader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
-                phongShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
-                phongShader.setVec3("lightPos", auxLightPosition);
                 phongShader.setVec3("viewPos", camera.Position);
 
-                // view/projection transformations
-                projection = utils::perspectiveMatrix(0.f, 1.f, 0.f, 1.f, 5.f, -5.f);
-                phongShader.setMat4("projection", projection.getMatrix());
-                view = camera.GetViewMatrix();
-                phongShader.setMat4("view", view.getMatrix());
+                //send the point lights information to the shader for each point light
+                for(int i = 0; i < lightingInformation.numberOfPointLights; i++){
+                    //get the point light
+                    PointLight* currentPointLight = &lightingInformation.pointLights[i];
+                    //set the parameters of the shader
+                    phongShader.setVec3(std::string("pointLights[") + std::to_string(i) +
+                                        std::string("].position"), currentPointLight->position);
+                    phongShader.setFloat(std::string("pointLights[") + std::to_string(i) +
+                                        std::string("].constant"), currentPointLight->constant);
+                    phongShader.setFloat(std::string("pointLights[") + std::to_string(i) +
+                                        std::string("].linear"), currentPointLight->linear);
+                    phongShader.setFloat(std::string("pointLights[") + std::to_string(i) +
+                                        std::string("].quadratic"), currentPointLight->quadratic);
+                    phongShader.setVec3(std::string("pointLights[") + std::to_string(i) +
+                                        std::string("].ambient"), currentPointLight->ambient);
+                    phongShader.setVec3(std::string("pointLights[") + std::to_string(i) +
+                                        std::string("].diffuse"), currentPointLight->diffuse);
+                    phongShader.setVec3(std::string("pointLights[") + std::to_string(i) +
+                                        std::string("].specular"), currentPointLight->specular);
+
+                }
+
+                //set tranformation matrices
                 modelMatrix = modelMatrix.transpose();
                 phongShader.setMat4("model", modelMatrix.getMatrix());
+                view = camera.GetViewMatrix();
+                phongShader.setMat4("view", view.getMatrix());
+                projection = utils::perspectiveMatrix(0.f, 1.f, 0.f, 1.f, 5.f, -5.f);
+                phongShader.setMat4("projection", projection.getMatrix());
+
             //use the gouraud shader
             }else{
                 // be sure to activate shader when setting uniforms/drawing objects
@@ -302,12 +328,12 @@ namespace graphicslib {
                 gouraudShader.setVec3("viewPos", camera.Position);
 
                 // view/projection transformations
-                projection = utils::perspectiveMatrix(0.f, 1.f, 0.f, 1.f, 5.f, -5.f);
-                gouraudShader.setMat4("projection", projection.getMatrix());
-                view = camera.GetViewMatrix();
-                gouraudShader.setMat4("view", view.getMatrix());
                 modelMatrix = modelMatrix.transpose();
                 gouraudShader.setMat4("model", modelMatrix.getMatrix());
+                view = camera.GetViewMatrix();
+                gouraudShader.setMat4("view", view.getMatrix());
+                projection = utils::perspectiveMatrix(0.f, 1.f, 0.f, 1.f, 5.f, -5.f);
+                gouraudShader.setMat4("projection", projection.getMatrix());
 
             }
 
@@ -384,7 +410,6 @@ namespace graphicslib {
         }
 
     }
-
 
     // set up vertex data (and buffer(s)) and configure vertex attributes from the cube
     unsigned int Window::loadCubeVAO(){
