@@ -178,6 +178,7 @@ namespace graphicslib {
 
 
         std::ifstream sceneFile(FILE);
+        //check if an error has ocurred while opening the file
         if(!sceneFile){
             std::cerr << "*** Error while opening file " << FILE << " ***" << std::endl;
             exit(EXIT_FAILURE);
