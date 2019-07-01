@@ -18,5 +18,5 @@ void main()
     //TexCoords = aTexCoords;
     //TexCoords = vec3(1.0, 0.5, 0.31);
     
-    gl_Position = projection * view * vec4(FragPos, 1.0);
+    gl_Position = projection * view * vec4(FragPos, 1.0); //TODO shoud I multiply the model matrix here too?
 }
