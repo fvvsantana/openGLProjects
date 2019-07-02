@@ -117,65 +117,6 @@ namespace graphicslib {
     void Window::run(){
 
         //------------------//
-        //READ THE MODEL.TXT//
-        //------------------//
-
-        std::ifstream modelFile("model.txt");
-        std::string modelPath;
-        int i = 0;
-        // build and compile shaders
-
-        //delta is the distance between the origin of the coordinate system and the center of the i model
-        std::vector<float> delta;
-        delta.push_back(0);
-
-        std::vector<Model> models;
-        //previousModelSize is the half the x-axis size of the model on the left of the current model
-        //it is used to obtain the delta value for the current model
-        float previousModelSize = 0;
-        // load models
-        while(std::getline(modelFile, modelPath)){
-
-            Model model(modelPath);
-
-            // calculate the bounding box of the model
-            model.calcBoundingBox();
-
-            // size of the biggest dimension of the model
-            float size = model.biggestDimensionSize();
-
-            // initial rotation
-            modelCoord.rotation[0] = 0.f;
-            modelCoord.rotation[1] = 0.f;
-            modelCoord.rotation[2] = 0.f;
-
-            // initial scale
-            modelCoord.scale[0] = 2.f/size;
-            modelCoord.scale[1] = 2.f/size;
-            modelCoord.scale[2] = 2.f/size;
-
-            modelCoord.position[0] = -(model.boundingBox.x.center);
-            modelCoord.position[1] = -(model.boundingBox.y.center);
-            modelCoord.position[2] = -(model.boundingBox.z.center);
-
-            //to set the delta distance, we need the delta of the previous model, half of its size, half of the
-            //size of the current model and a constant value (so the models won't be rendered too close to each other)
-            if(i != 0) {
-                delta.push_back(delta[i - 1] + previousModelSize + modelCoord.scale[0]*model.boundingBox.x.size/2 + 0.25);
-            }
-            previousModelSize = modelCoord.scale[0]*model.boundingBox.x.size/2;
-
-            i++;
-            modelCoordVector.push_back(modelCoord);
-            models.push_back(model);
-        }
-
-        modelFile.close();
-
-
-
-
-        //------------------//
         //READ THE SCENE.TXT//
         //------------------//
 
@@ -186,6 +127,22 @@ namespace graphicslib {
             exit(EXIT_FAILURE);
         }
         std::string line;
+        
+
+        // structures that will be used to read objects and display them on the screen
+        // --------------------------------------------------------------------------------------------
+        int i = 0;
+        
+        //delta is the distance between the origin of the coordinate system and the center of the i model
+        std::vector<float> delta;
+        delta.push_back(0);
+
+        std::vector<Model> models;
+        //previousModelSize is the half the x-axis size of the model on the left of the current model
+        //it is used to obtain the delta value for the current model
+        float previousModelSize = 0;
+        // -------------------------------------------------------------------------------------------
+
 
         //initialize the number of lights
         lightingInformation.numberOfPointLights = 0;
@@ -243,6 +200,47 @@ namespace graphicslib {
                            >> lookAt.x >> lookAt.y >> lookAt.z
                            >> up.x >> up.y >> up.z;
                 camera = Camera(position, up, lookAt);
+            }
+
+            // if it's defining a object
+            else if(firstWord == "object"){
+                std::string path;
+                glm::vec3 center;
+                lineStream >> path >> center.x >> center.y >> center.z;
+
+                Model model(path);
+
+                // calculate the bounding box of the model
+                model.calcBoundingBox();
+
+                // size of the biggest dimension of the model
+                float size = model.biggestDimensionSize();
+
+                // initial rotation
+                modelCoord.rotation[0] = 0.f;
+                modelCoord.rotation[1] = 0.f;
+                modelCoord.rotation[2] = 0.f;
+
+                // initial scale
+                modelCoord.scale[0] = 2.f/size;
+                modelCoord.scale[1] = 2.f/size;
+                modelCoord.scale[2] = 2.f/size;
+
+                modelCoord.position[0] = -(model.boundingBox.x.center);
+                modelCoord.position[1] = -(model.boundingBox.y.center);
+                modelCoord.position[2] = -(model.boundingBox.z.center);
+
+                //to set the delta distance, we need the delta of the previous model, half of its size, half of the
+                //size of the current model and a constant value (so the models won't be rendered too close to each other)
+                if(i != 0) {
+                    delta.push_back(delta[i - 1] + previousModelSize + modelCoord.scale[0]*model.boundingBox.x.size/2 + 0.25);
+                }
+                previousModelSize = modelCoord.scale[0]*model.boundingBox.x.size/2;
+
+                i++;
+                modelCoordVector.push_back(modelCoord);
+                models.push_back(model);
+
             }
 
         }
