@@ -186,10 +186,6 @@ namespace graphicslib {
             exit(EXIT_FAILURE);
         }
         std::string line;
-        std::string firstWord;
-
-        char auxString[20];
-        //std::string auxString;
 
         //initialize the number of lights
         lightingInformation.numberOfPointLights = 0;
@@ -200,16 +196,20 @@ namespace graphicslib {
                 continue;
             }
 
+            // first word of the line
+            std::string firstWord;
+
             //read the first word of the line
             std::istringstream lineStream(line);
             lineStream >> firstWord;
 
             //if it's adding a light in the scene
-            if(firstWord.compare("light") == 0){
+            if(firstWord == "light"){
                 //get the point light to alter
                 int index = lightingInformation.numberOfPointLights;
                 PointLight* currentPointLight = &lightingInformation.pointLights[index];
 
+                char auxString[20];
                 //read and store the information in the point light
                 sscanf(lineStream.str().c_str(), "%s  %f %f %f  %f %f %f  %f %f %f",
                        auxString,
@@ -233,12 +233,9 @@ namespace graphicslib {
 
                 //increment the number of point lights
                 lightingInformation.numberOfPointLights++;
-                /*
-                while(lineStream >> word){
-                    std::cout << word << std::endl;
-                }
-                */
             }
+
+            // if it's defining a camera
             else if(firstWord == "camera"){
                 glm::vec3 position, up, lookAt;
                 // read information about the camera (position, lookAt point and view up vector)
