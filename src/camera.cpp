@@ -1,13 +1,13 @@
 #include <camera.hpp>
 
 // Constructor with vectors
-Camera::Camera(glm::vec3 position, glm::vec3 up, float yaw, float pitch)
+Camera::Camera(glm::vec3 position, glm::vec3 up, glm::vec3 lookAt)
     : Front(glm::vec3(0.0f, 0.0f, -1.0f)), MovementSpeed(SPEED), MouseSensitivity(SENSITIVITY)
 {
     Position = position;
     WorldUp = up;
-    Yaw = yaw;
-    Pitch = pitch;
+    Yaw = glm::atan(lookAt.x - position.x, position.z - lookAt.z);
+    Pitch = glm::atan((lookAt.y - position.y)/(position.z - lookAt.z));
     updateCameraVectors();
 }
 
@@ -93,9 +93,9 @@ void Camera::updateCameraVectors()
 {
     // Calculate the new Front vector
     glm::vec3 front;
-    front.x = cos(glm::radians(Yaw)) * cos(glm::radians(Pitch));
-    front.y = sin(glm::radians(Pitch));
-    front.z = sin(glm::radians(Yaw)) * cos(glm::radians(Pitch));
+    front.x = cos(Yaw) * cos(Pitch);
+    front.y = sin(Pitch);
+    front.z = sin(Yaw) * cos(Pitch);
     Front = glm::normalize(front);
     // Also re-calculate the Right and Up vector
     // Normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
