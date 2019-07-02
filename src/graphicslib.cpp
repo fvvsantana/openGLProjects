@@ -237,13 +237,21 @@ namespace graphicslib {
                 }
                 */
             }
+            else if(firstWord == "camera"){
+                glm::vec3 position, up, lookAt;
+                // read information about the camera (position, lookAt point and view up vector)
+                lineStream >> position.x >> position.y >> position.z
+                           >> lookAt.x >> lookAt.y >> lookAt.z
+                           >> up.x >> up.y >> up.z;
+                camera = Camera(position, up, lookAt);
+            }
 
         }
 
 
 
         // build and compile our shader zprogram
-            // ------------------------------------
+        // ------------------------------------
         Shader phongShader("src/multipleLightsPhong.vs", "src/multipleLightsPhong.fs");
         Shader gouraudShader("src/multipleLightsGouraud.vs", "src/multipleLightsGouraud.fs");
         Shader lampShader("src/lamp.vs", "src/lamp.fs");

@@ -4,6 +4,7 @@ resources/objects/planet/planet.obj
 resources/objects/nanosuit/nanosuit.obj
 
 //camera <position (x,y,z) <look at point (x,y,z)> <view up vector>
+camera 0.0 0.0 3.0  0.0 0.0 0.0  0.0 1.0 0.0
 
 //light <position (x,y,z)> <color (r,g,b)> <attenuation (linear, constant, quadratic)>
 light 0.75 0.75 0.75  1.0 1.0 1.0  0.2 0.0 0.0
