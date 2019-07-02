@@ -6,7 +6,7 @@ Camera::Camera(glm::vec3 position, glm::vec3 up, glm::vec3 lookAt)
 {
     Position = position;
     WorldUp = up;
-    Yaw = glm::atan(lookAt.x - position.x, position.z - lookAt.z);
+    Yaw = glm::atan(lookAt.x - position.x, position.z - lookAt.z) - glm::radians(90.f);
     Pitch = glm::atan((lookAt.y - position.y)/(position.z - lookAt.z));
     updateCameraVectors();
 }

@@ -47,7 +47,7 @@ public:
 
     // Constructor with vectors
     Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f),
-           glm::vec3 lookAt = glm::vec3(-8.f, 0.f, 2.5f));
+           glm::vec3 lookAt = glm::vec3(0.f, 0.f, 0.f));
 
     // Constructor with scalar values
     Camera(float posX, float posY, float posZ, float upX, float upY, float upZ, float yaw, float pitch);
