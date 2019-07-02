@@ -19,7 +19,7 @@
 namespace graphicslib {
 
     // camera
-    Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+    Camera camera;
     float lastX;
     float lastY;
     float firstMouse = true;
@@ -238,6 +238,14 @@ namespace graphicslib {
                     std::cout << word << std::endl;
                 }
                 */
+            }
+            else if(firstWord == "camera"){
+                glm::vec3 position, up, lookAt;
+                // read information about the camera (position, lookAt point and view up vector)
+                lineStream >> position.x >> position.y >> position.z
+                           >> lookAt.x >> lookAt.y >> lookAt.z
+                           >> up.x >> up.y >> up.z;
+                camera = Camera(position, up, lookAt);
             }
 
         }
