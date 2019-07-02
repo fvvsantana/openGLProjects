@@ -178,6 +178,7 @@ namespace graphicslib {
 
 
         std::ifstream sceneFile(FILE);
+        //check if an error has ocurred while opening the file
         if(!sceneFile){
             std::cerr << "*** Error while opening file " << FILE << " ***" << std::endl;
             exit(EXIT_FAILURE);
@@ -244,7 +245,7 @@ namespace graphicslib {
         // build and compile our shader zprogram
             // ------------------------------------
         Shader phongShader("src/multipleLightsPhong.vs", "src/multipleLightsPhong.fs");
-        Shader gouraudShader("src/gouraud.vs", "src/gouraud.fs");
+        Shader gouraudShader("src/multipleLightsGouraud.vs", "src/multipleLightsGouraud.fs");
         Shader lampShader("src/lamp.vs", "src/lamp.fs");
 
 
@@ -271,6 +272,17 @@ namespace graphicslib {
 
         //send the number of point lights
         phongShader.setInt("numberOfPointLights", lightingInformation.numberOfPointLights);
+
+        //set gouraud shader material properties
+        gouraudShader.use();
+        gouraudShader.setInt("material.diffuse", 0);
+        gouraudShader.setInt("material.specular", 1);
+        gouraudShader.setFloat("material.shininess", 32.0f);
+
+        //send the number of point lights
+        gouraudShader.setInt("numberOfPointLights", lightingInformation.numberOfPointLights);
+        //send the color of the cube
+        gouraudShader.setVec3("objectColor", glm::vec3(1.0, 0.5, 0.31));
 
         // render loop
         while(!glfwWindowShouldClose(mWindow)){
@@ -311,7 +323,6 @@ namespace graphicslib {
                                         std::string("].diffuse"), currentPointLight->diffuse);
                     phongShader.setVec3(std::string("pointLights[") + std::to_string(i) +
                                         std::string("].specular"), currentPointLight->specular);
-
                 }
 
                 //set tranformation matrices
@@ -324,6 +335,31 @@ namespace graphicslib {
 
             //use the gouraud shader
             }else{
+                // be sure to activate shader when setting uniforms/drawing objects
+                gouraudShader.use();
+                gouraudShader.setVec3("viewPos", camera.Position);
+
+                //send the point lights information to the shader for each point light
+                for(int i = 0; i < lightingInformation.numberOfPointLights; i++){
+                    //get the point light
+                    PointLight* currentPointLight = &lightingInformation.pointLights[i];
+                    //set the parameters of the shader
+                    gouraudShader.setVec3(std::string("pointLights[") + std::to_string(i) +
+                                        std::string("].position"), currentPointLight->position);
+                    gouraudShader.setFloat(std::string("pointLights[") + std::to_string(i) +
+                                        std::string("].constant"), currentPointLight->constant);
+                    gouraudShader.setFloat(std::string("pointLights[") + std::to_string(i) +
+                                        std::string("].linear"), currentPointLight->linear);
+                    gouraudShader.setFloat(std::string("pointLights[") + std::to_string(i) +
+                                        std::string("].quadratic"), currentPointLight->quadratic);
+                    gouraudShader.setVec3(std::string("pointLights[") + std::to_string(i) +
+                                        std::string("].ambient"), currentPointLight->ambient);
+                    gouraudShader.setVec3(std::string("pointLights[") + std::to_string(i) +
+                                        std::string("].diffuse"), currentPointLight->diffuse);
+                    gouraudShader.setVec3(std::string("pointLights[") + std::to_string(i) +
+                                        std::string("].specular"), currentPointLight->specular);
+                }
+
                 // be sure to activate shader when setting uniforms/drawing objects
                 gouraudShader.use();
                 gouraudShader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
@@ -341,12 +377,9 @@ namespace graphicslib {
 
             }
 
-
-
             // render the cube
             glBindVertexArray(cubeVAO);
             glDrawArrays(GL_TRIANGLES, 0, 36);
-
 
 
             lampShader.use();
