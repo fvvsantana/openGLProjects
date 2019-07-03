@@ -143,9 +143,6 @@ namespace graphicslib {
         std::vector<float> delta;
         delta.push_back(0);
 
-        //previousModelSize is the half the x-axis size of the model on the left of the current model
-        //it is used to obtain the delta value for the current model
-        float previousModelSize = 0;
         // -------------------------------------------------------------------------------------------
 
 
@@ -210,8 +207,8 @@ namespace graphicslib {
             // if it's defining an object
             else if(firstWord == "object"){
                 std::string path;
-                glm::vec3 center;
-                lineStream >> path >> center.x >> center.y >> center.z;
+                glm::vec3 finalPos;
+                lineStream >> path >> finalPos.x >> finalPos.y >> finalPos.z;
 
                 //create an ModelInformation instance
                 ModelInformation currentModelInfo;
@@ -252,17 +249,12 @@ namespace graphicslib {
                 currentModelInfo.scale[1] = 2.f/size;
                 currentModelInfo.scale[2] = 2.f/size;
 
-                currentModelInfo.position[0] = -(model.boundingBox.x.center);
-                currentModelInfo.position[1] = -(model.boundingBox.y.center);
-                currentModelInfo.position[2] = -(model.boundingBox.z.center);
+                // translate object to position "finalPos"
+                currentModelInfo.position[0] = finalPos.x - model.boundingBox.x.center;
+                currentModelInfo.position[1] = finalPos.y - model.boundingBox.y.center;
+                currentModelInfo.position[2] = finalPos.z - model.boundingBox.z.center;
 
-                //to set the delta distance, we need the delta of the previous model, half of its size, half of the
-                //size of the current model and a constant value (so the models won't be rendered too close to each other)
-                if(i != 0) {
-                    delta.push_back(delta[i - 1] + previousModelSize + currentModelInfo.scale[0]*model.boundingBox.x.size/2 + 0.25);
-                }
-                previousModelSize = currentModelInfo.scale[0]*model.boundingBox.x.size/2;
-
+              
                 i++;
 
                 //finally append the current information to the vector

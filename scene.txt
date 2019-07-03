@@ -1,13 +1,13 @@
 //object ​<path do arquivo> <X Y Z do centro do objeto>
-object resources/objects/cyborg/cyborg.obj 0.0 0.0 0.0
-object resources/objects/rock/rock.obj 0.0 0.0 0.0
-object resources/objects/planet/planet.obj 0.0 0.0 0.0
-object resources/objects/nanosuit/nanosuit.obj 0.0 0.0 0.0
+object resources/objects/cyborg/cyborg.obj 0.0 3.0 0.0
+object resources/objects/rock/rock.obj 0.0 -3.0 0.0
+object resources/objects/planet/planet.obj 5.0 0.0 0.0
+object resources/objects/nanosuit/nanosuit.obj -10.0 0.0 0.0
 
 //light <position (x,y,z)> <color (r,g,b)> <attenuation (linear, constant, quadratic)>
 light 0.75 0.75 0.75  1.0 1.0 1.0  0.2 0.0 0.0
 light -0.5 -0.5 0.75  1.0 1.0 1.0  0.2 0.0 0.0
 
 //camera <position (x,y,z)> <look at point (x,y,z)> <view up vector>
-camera 0.0 0.0 3.0  0.0 0.0 0.0  0.0 1.0 0.0
+camera 0.0 0.0 6.0  0.0 0.0 0.0  0.0 1.0 0.0
 
