@@ -82,7 +82,7 @@ namespace graphicslib {
     class Window {
     private:
 
-//#define SHOW_CUBE
+#define SHOW_CUBE
 #ifdef SHOW_CUBE
 
         //Temporary cube just to see the shader effects clearly
@@ -139,7 +139,9 @@ namespace graphicslib {
 
         // perspective type
         bool mPhong;
-        bool mPReleased;
+        bool mShowCube;
+        bool mLReleased;
+        bool mCReleased;
 
         // timing
         float mDeltaTime;

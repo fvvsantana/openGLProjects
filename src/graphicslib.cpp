@@ -52,7 +52,9 @@ namespace graphicslib {
         lastY = windowHeight/2.0f;
 
         mPhong = true;
-        mPReleased = true;
+        mShowCube = false;
+        mLReleased = true;
+        mCReleased = true;
 
         // timing
         mDeltaTime = 0.0f;
@@ -76,7 +78,7 @@ namespace graphicslib {
     //create the window, load glad, load shaders
     void Window::createWindow() {
         //create window
-        mWindow = glfwCreateWindow(mWindowWidth, mWindowHeight, "Camera View", NULL, NULL);
+        mWindow = glfwCreateWindow(mWindowWidth, mWindowHeight, "Lighting application", NULL, NULL);
 
         if(mWindow == NULL) {
             std::cerr << "Failed to create GLFW window" << std::endl;
@@ -462,8 +464,9 @@ namespace graphicslib {
 
 #ifdef SHOW_CUBE
 
-            //use the phong shader
-            if(mPhong){
+            if(mShowCube){
+                //use the phong shader
+                if(mPhong){
 
                 //---------//
                 //DRAW CUBE//
@@ -479,19 +482,19 @@ namespace graphicslib {
                     PointLight* currentPointLight = &lightingInformation.pointLights[i];
                     //set the parameters of the shader
                     phongShader.setVec3(std::string("pointLights[") + std::to_string(i) +
-                                        std::string("].position"), currentPointLight->position);
+                            std::string("].position"), currentPointLight->position);
                     phongShader.setFloat(std::string("pointLights[") + std::to_string(i) +
-                                        std::string("].constant"), currentPointLight->constant);
+                            std::string("].constant"), currentPointLight->constant);
                     phongShader.setFloat(std::string("pointLights[") + std::to_string(i) +
-                                        std::string("].linear"), currentPointLight->linear);
+                            std::string("].linear"), currentPointLight->linear);
                     phongShader.setFloat(std::string("pointLights[") + std::to_string(i) +
-                                        std::string("].quadratic"), currentPointLight->quadratic);
+                            std::string("].quadratic"), currentPointLight->quadratic);
                     phongShader.setVec3(std::string("pointLights[") + std::to_string(i) +
-                                        std::string("].ambient"), currentPointLight->ambient);
+                            std::string("].ambient"), currentPointLight->ambient);
                     phongShader.setVec3(std::string("pointLights[") + std::to_string(i) +
-                                        std::string("].diffuse"), currentPointLight->diffuse);
+                            std::string("].diffuse"), currentPointLight->diffuse);
                     phongShader.setVec3(std::string("pointLights[") + std::to_string(i) +
-                                        std::string("].specular"), currentPointLight->specular);
+                            std::string("].specular"), currentPointLight->specular);
                 }
 
                 //set tranformation matrices
@@ -507,8 +510,8 @@ namespace graphicslib {
                 glDrawArrays(GL_TRIANGLES, 0, 36);
 
 
-            //use the gouraud shader
-            }else{
+                //use the gouraud shader
+                }else{
 
                 //---------//
                 //DRAW CUBE//
@@ -524,19 +527,19 @@ namespace graphicslib {
                     PointLight* currentPointLight = &lightingInformation.pointLights[i];
                     //set the parameters of the shader
                     gouraudShader.setVec3(std::string("pointLights[") + std::to_string(i) +
-                                        std::string("].position"), currentPointLight->position);
+                            std::string("].position"), currentPointLight->position);
                     gouraudShader.setFloat(std::string("pointLights[") + std::to_string(i) +
-                                        std::string("].constant"), currentPointLight->constant);
+                            std::string("].constant"), currentPointLight->constant);
                     gouraudShader.setFloat(std::string("pointLights[") + std::to_string(i) +
-                                        std::string("].linear"), currentPointLight->linear);
+                            std::string("].linear"), currentPointLight->linear);
                     gouraudShader.setFloat(std::string("pointLights[") + std::to_string(i) +
-                                        std::string("].quadratic"), currentPointLight->quadratic);
+                            std::string("].quadratic"), currentPointLight->quadratic);
                     gouraudShader.setVec3(std::string("pointLights[") + std::to_string(i) +
-                                        std::string("].ambient"), currentPointLight->ambient);
+                            std::string("].ambient"), currentPointLight->ambient);
                     gouraudShader.setVec3(std::string("pointLights[") + std::to_string(i) +
-                                        std::string("].diffuse"), currentPointLight->diffuse);
+                            std::string("].diffuse"), currentPointLight->diffuse);
                     gouraudShader.setVec3(std::string("pointLights[") + std::to_string(i) +
-                                        std::string("].specular"), currentPointLight->specular);
+                            std::string("].specular"), currentPointLight->specular);
                 }
 
                 // be sure to activate shader when setting uniforms/drawing objects
@@ -554,9 +557,8 @@ namespace graphicslib {
                 // render the cube
                 glBindVertexArray(cubeVAO);
                 glDrawArrays(GL_TRIANGLES, 0, 36);
+                }
             }
-
-
 
 #endif
 
@@ -679,16 +681,25 @@ namespace graphicslib {
             camera.ProcessKeyboard(RIGHT, mDeltaTime);
         }
 
-        if(mPReleased){
+        if(mLReleased){
             if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS){
                 mPhong = !mPhong;
             }
-            mPReleased = false;
+            mLReleased = false;
         }
         if (glfwGetKey(window, GLFW_KEY_L) == GLFW_RELEASE){
-            mPReleased = true;
+            mLReleased = true;
         }
 
+        if(mCReleased){
+            if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS){
+                mShowCube = !mShowCube;
+            }
+            mCReleased = false;
+        }
+        if (glfwGetKey(window, GLFW_KEY_C) == GLFW_RELEASE){
+            mCReleased = true;
+        }
     }
 
     // glfw: whenever the mouse moves, this callback is called
