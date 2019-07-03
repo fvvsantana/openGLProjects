@@ -136,12 +136,11 @@ namespace graphicslib {
         }
         std::string line;
         
-
-
-
         int i = 0;
+
         //initialize the number of lights
         lightingInformation.numberOfPointLights = 0;
+        
         //read a line of the file
         while(std::getline(sceneFile, line)){
             //treat the case of having \n in the end of the file
@@ -162,22 +161,17 @@ namespace graphicslib {
                 int index = lightingInformation.numberOfPointLights;
                 PointLight* currentPointLight = &lightingInformation.pointLights[index];
 
-                char auxString[20];
-                //read and store the information in the point light
-                sscanf(lineStream.str().c_str(), "%s  %f %f %f  %f %f %f  %f %f %f",
-                       auxString,
-                       &(currentPointLight->position[0]),
-                       &(currentPointLight->position[1]),
-                       &(currentPointLight->position[2]),
-                       &(currentPointLight->ambient[0]),
-                       &(currentPointLight->ambient[1]),
-                       &(currentPointLight->ambient[2]),
-                       &(currentPointLight->linear),
-                       &(currentPointLight->constant),
-                       &(currentPointLight->quadratic));
+                lineStream >> currentPointLight->position[0]
+                           >> currentPointLight->position[1]
+                           >> currentPointLight->position[2]
+                           >> currentPointLight->ambient[0]
+                           >> currentPointLight->ambient[1]
+                           >> currentPointLight->ambient[2]
+                           >> currentPointLight->linear
+                           >> currentPointLight->constant
+                           >> currentPointLight->quadratic;
                 currentPointLight->diffuse = currentPointLight->ambient;
                 currentPointLight->specular = currentPointLight->ambient;
-
 
                 //also alter the point light for buffer
                 PointLightForBuffer* currentPointLightForBuffer = &lightingInformation.bufferOfPointLights[index];
