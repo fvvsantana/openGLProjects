@@ -116,6 +116,12 @@ namespace graphicslib {
 
     void Window::run(){
 
+        Shader phongColorShader("src/multipleLightsPhongColor.vs", "src/multipleLightsPhongColor.fs");
+        Shader gouraudColorShader("src/multipleLightsGouraudColor.vs", "src/multipleLightsGouraudColor.fs");
+
+        Shader phongTexShader("src/multipleLightsPhongTex.vs", "src/multipleLightsPhongTex.fs");
+        Shader gouraudTexShader("src/multipleLightsGouraudTex.vs", "src/multipleLightsGouraudTex.fs");
+
         //------------------//
         //READ THE SCENE.TXT//
         //------------------//
@@ -137,7 +143,6 @@ namespace graphicslib {
         std::vector<float> delta;
         delta.push_back(0);
 
-        std::vector<Model> models;
         //previousModelSize is the half the x-axis size of the model on the left of the current model
         //it is used to obtain the delta value for the current model
         float previousModelSize = 0;
@@ -202,13 +207,34 @@ namespace graphicslib {
                 camera = Camera(position, up, lookAt);
             }
 
-            // if it's defining a object
+            // if it's defining an object
             else if(firstWord == "object"){
                 std::string path;
                 glm::vec3 center;
                 lineStream >> path >> center.x >> center.y >> center.z;
 
-                Model model(path);
+                //create an ModelInformation instance
+                ModelInformation currentModelInfo;
+
+                //create a new model
+                currentModelInfo.model = new Model(path);
+                //add a reference to it just to ease the coding
+                Model &model = *(currentModelInfo.model);
+
+
+                //check if the model has textures
+                if(model.getNumberOfTexturesLoaded()){
+                    //set the shaders with textures
+                    currentModelInfo.phongShader = &phongTexShader;
+                    currentModelInfo.gouraudShader = &gouraudTexShader;
+                }else{
+                    //set the shaders with color
+                    currentModelInfo.phongShader = &phongColorShader;
+                    currentModelInfo.gouraudShader = &gouraudColorShader;
+                }
+
+
+                //set model coordinates
 
                 // calculate the bounding box of the model
                 model.calcBoundingBox();
@@ -217,29 +243,31 @@ namespace graphicslib {
                 float size = model.biggestDimensionSize();
 
                 // initial rotation
-                modelCoord.rotation[0] = 0.f;
-                modelCoord.rotation[1] = 0.f;
-                modelCoord.rotation[2] = 0.f;
+                currentModelInfo.rotation[0] = 0.f;
+                currentModelInfo.rotation[1] = 0.f;
+                currentModelInfo.rotation[2] = 0.f;
 
                 // initial scale
-                modelCoord.scale[0] = 2.f/size;
-                modelCoord.scale[1] = 2.f/size;
-                modelCoord.scale[2] = 2.f/size;
+                currentModelInfo.scale[0] = 2.f/size;
+                currentModelInfo.scale[1] = 2.f/size;
+                currentModelInfo.scale[2] = 2.f/size;
 
-                modelCoord.position[0] = -(model.boundingBox.x.center);
-                modelCoord.position[1] = -(model.boundingBox.y.center);
-                modelCoord.position[2] = -(model.boundingBox.z.center);
+                currentModelInfo.position[0] = -(model.boundingBox.x.center);
+                currentModelInfo.position[1] = -(model.boundingBox.y.center);
+                currentModelInfo.position[2] = -(model.boundingBox.z.center);
 
                 //to set the delta distance, we need the delta of the previous model, half of its size, half of the
                 //size of the current model and a constant value (so the models won't be rendered too close to each other)
                 if(i != 0) {
-                    delta.push_back(delta[i - 1] + previousModelSize + modelCoord.scale[0]*model.boundingBox.x.size/2 + 0.25);
+                    delta.push_back(delta[i - 1] + previousModelSize + currentModelInfo.scale[0]*model.boundingBox.x.size/2 + 0.25);
                 }
-                previousModelSize = modelCoord.scale[0]*model.boundingBox.x.size/2;
+                previousModelSize = currentModelInfo.scale[0]*model.boundingBox.x.size/2;
 
                 i++;
-                modelCoordVector.push_back(modelCoord);
-                models.push_back(model);
+
+                //finally append the current information to the vector
+                mModelInformationVector.push_back(currentModelInfo);
+
 
             }
 
@@ -256,8 +284,10 @@ namespace graphicslib {
         //load the point lights VAO (buffer already filled)
         unsigned int pointLightsVAO = loadPointLightsVAO();
 
+#ifdef SHOW_CUBE
         //load the cube
         unsigned int cubeVAO = loadCubeVAO();
+#endif
 
         float currentFrame;
         ml::matrix<float> projection(4, 4);
@@ -289,7 +319,6 @@ namespace graphicslib {
         gouraudShader.setVec3("objectColor", glm::vec3(1.0, 0.5, 0.31));
 
 
-        Shader phongTexShader("src/multipleLightsPhongTex.vs", "src/multipleLightsPhongTex.fs");
         //setup the multiple light model using textures
         phongTexShader.use();
         phongTexShader.setFloat("shininess", 32.0f);
@@ -297,12 +326,24 @@ namespace graphicslib {
         phongTexShader.setInt("numberOfPointLights", lightingInformation.numberOfPointLights);
 
 
-        Shader gouraudTexShader("src/multipleLightsGouraudTex.vs", "src/multipleLightsGouraudTex.fs");
         //setup the multiple light model using textures
         gouraudTexShader.use();
         gouraudTexShader.setFloat("shininess", 32.0f);
         //send the number of point lights
         gouraudTexShader.setInt("numberOfPointLights", lightingInformation.numberOfPointLights);
+
+        //setup the multiple light model using textures
+        phongColorShader.use();
+        phongColorShader.setFloat("shininess", 32.0f);
+        //send the number of point lights
+        phongColorShader.setInt("numberOfPointLights", lightingInformation.numberOfPointLights);
+
+
+        //setup the multiple light model using textures
+        gouraudColorShader.use();
+        gouraudColorShader.setFloat("shininess", 32.0f);
+        //send the number of point lights
+        gouraudColorShader.setInt("numberOfPointLights", lightingInformation.numberOfPointLights);
 
         Shader lampShader("src/lamp.vs", "src/lamp.fs");
 
@@ -327,14 +368,9 @@ namespace graphicslib {
             glClearColor(0.05f, 0.05f, 0.05f, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-            //use the phong shader
+
+
             if(mPhong){
-
-
-                //----------//
-                //DRAW MODEL//
-                //----------//
-
                 //enable shader
                 phongTexShader.use();
                 //use perspective projection
@@ -344,63 +380,107 @@ namespace graphicslib {
                 view = camera.GetViewMatrix();
                 phongTexShader.setMat4("view", view.getMatrix());
 
-                i = 0;
-                // render the loaded models
-                for(auto model : models){
+                //enable shader
+                phongColorShader.use();
+                //use perspective projection
+                projection = utils::perspectiveMatrix(0.f, 1.f, 0.f, 1.f, 5.f, -5.f);
+                // view/projection transformations
+                phongColorShader.setMat4("projection", projection.getMatrix());
+                view = camera.GetViewMatrix();
+                phongColorShader.setMat4("view", view.getMatrix());
+            }else{
+                //enable shader
+                gouraudTexShader.use();
+                //use perspective projection
+                projection = utils::perspectiveMatrix(0.f, 1.f, 0.f, 1.f, 5.f, -5.f);
+                // view/projection transformations
+                gouraudTexShader.setMat4("projection", projection.getMatrix());
+                view = camera.GetViewMatrix();
+                gouraudTexShader.setMat4("view", view.getMatrix());
 
-                    phongTexShader.setVec3("viewPos", camera.Position);
+                //enable shader
+                gouraudColorShader.use();
+                //use perspective projection
+                projection = utils::perspectiveMatrix(0.f, 1.f, 0.f, 1.f, 5.f, -5.f);
+                // view/projection transformations
+                gouraudColorShader.setMat4("projection", projection.getMatrix());
+                view = camera.GetViewMatrix();
+                gouraudColorShader.setMat4("view", view.getMatrix());
 
-                    //send the point lights information to the shader for each point light
-                    for(int i = 0; i < lightingInformation.numberOfPointLights; i++){
-                        //get the point light
-                        PointLight* currentPointLight = &lightingInformation.pointLights[i];
-                        //set the parameters of the shader
-                        phongTexShader.setVec3(std::string("pointLights[") + std::to_string(i) +
-                            std::string("].position"), currentPointLight->position);
-                        phongTexShader.setFloat(std::string("pointLights[") + std::to_string(i) +
-                            std::string("].constant"), currentPointLight->constant);
-                        phongTexShader.setFloat(std::string("pointLights[") + std::to_string(i) +
-                            std::string("].linear"), currentPointLight->linear);
-                        phongTexShader.setFloat(std::string("pointLights[") + std::to_string(i) +
-                            std::string("].quadratic"), currentPointLight->quadratic);
-                        phongTexShader.setVec3(std::string("pointLights[") + std::to_string(i) +
-                            std::string("].ambient"), currentPointLight->ambient);
-                        phongTexShader.setVec3(std::string("pointLights[") + std::to_string(i) +
-                            std::string("].diffuse"), currentPointLight->diffuse);
-                        phongTexShader.setVec3(std::string("pointLights[") + std::to_string(i) +
-                            std::string("].specular"), currentPointLight->specular);
-                    }
-
-                    //translate the current model to the side of the previous model
-                    ml::matrix<float> modelMatrix(4, 4, true);
-                    //tmp is the array used to translate the model using its assigned delta value
-                    float tmp[3] = {delta[i], 0, 0};
-                    modelMatrix = utils::translate(modelMatrix, tmp);
-
-                    // apply rotation
-                    modelMatrix = utils::rotateX(modelMatrix, modelCoordVector[i].rotation[0]);
-                    modelMatrix = utils::rotateY(modelMatrix, modelCoordVector[i].rotation[1]);
-                    modelMatrix = utils::rotateZ(modelMatrix, modelCoordVector[i].rotation[2]);
-
-                    // apply scale
-                    modelMatrix = utils::scale(modelMatrix, modelCoordVector[i].scale);
-
-                    // apply translation to the origin
-                    modelMatrix = utils::translate(modelMatrix, modelCoordVector[i].position);
+            }
 
 
-                    //transpose the matrix
-                    modelMatrix = modelMatrix.transpose();
+            i = 0;
+            // render the loaded models
+            for(auto modelInfo : mModelInformationVector){
 
-                    //pass the model matrix to the shader
-                    phongTexShader.setMat4("model", modelMatrix.getMatrix());
-                    model.Draw(phongTexShader);
+                Shader* currentShader;
 
-                    i++;
+                if(mPhong){
+                    currentShader = modelInfo.phongShader;
+                }else{
+                    currentShader = modelInfo.gouraudShader;
                 }
 
+                currentShader->use();
+
+                //TODO put this thing in the if out of the for
+                currentShader->setVec3("viewPos", camera.Position);
+
+                //send the point lights information to the shader for each point light
+                for(int i = 0; i < lightingInformation.numberOfPointLights; i++){
+                //get the point light
+                PointLight* currentPointLight = &lightingInformation.pointLights[i];
+                //set the parameters of the shader
+                currentShader->setVec3(std::string("pointLights[") + std::to_string(i) +
+                    std::string("].position"), currentPointLight->position);
+                currentShader->setFloat(std::string("pointLights[") + std::to_string(i) +
+                    std::string("].constant"), currentPointLight->constant);
+                currentShader->setFloat(std::string("pointLights[") + std::to_string(i) +
+                    std::string("].linear"), currentPointLight->linear);
+                currentShader->setFloat(std::string("pointLights[") + std::to_string(i) +
+                    std::string("].quadratic"), currentPointLight->quadratic);
+                currentShader->setVec3(std::string("pointLights[") + std::to_string(i) +
+                    std::string("].ambient"), currentPointLight->ambient);
+                currentShader->setVec3(std::string("pointLights[") + std::to_string(i) +
+                    std::string("].diffuse"), currentPointLight->diffuse);
+                currentShader->setVec3(std::string("pointLights[") + std::to_string(i) +
+                    std::string("].specular"), currentPointLight->specular);
+                }
+
+                //translate the current model to the side of the previous model
+                ml::matrix<float> modelMatrix(4, 4, true);
+                //tmp is the array used to translate the model using its assigned delta value
+                float tmp[3] = {delta[i], 0, 0};
+                modelMatrix = utils::translate(modelMatrix, tmp);
+
+                // apply rotation
+                modelMatrix = utils::rotateX(modelMatrix, modelInfo.rotation[0]);
+                modelMatrix = utils::rotateY(modelMatrix, modelInfo.rotation[1]);
+                modelMatrix = utils::rotateZ(modelMatrix, modelInfo.rotation[2]);
+
+                // apply scale
+                modelMatrix = utils::scale(modelMatrix, modelInfo.scale);
+
+                // apply translation to the origin
+                modelMatrix = utils::translate(modelMatrix, modelInfo.position);
 
 
+                //transpose the matrix
+                modelMatrix = modelMatrix.transpose();
+
+                //pass the model matrix to the shader
+                currentShader->setMat4("model", modelMatrix.getMatrix());
+                modelInfo.model->Draw(*currentShader);
+
+                i++;
+            }
+
+
+#ifdef SHOW_CUBE
+
+            //use the phong shader
+            if(mPhong){
 
                 //---------//
                 //DRAW CUBE//
@@ -446,78 +526,6 @@ namespace graphicslib {
 
             //use the gouraud shader
             }else{
-
-
-                //----------//
-                //DRAW MODEL//
-                //----------//
-
-                //enable shader
-                gouraudTexShader.use();
-                //use perspective projection
-                projection = utils::perspectiveMatrix(0.f, 1.f, 0.f, 1.f, 5.f, -5.f);
-                // view/projection transformations
-                gouraudTexShader.setMat4("projection", projection.getMatrix());
-                view = camera.GetViewMatrix();
-                gouraudTexShader.setMat4("view", view.getMatrix());
-
-                i = 0;
-                // render the loaded models
-                for(auto model : models){
-
-                    gouraudTexShader.setVec3("viewPos", camera.Position);
-
-                    //send the point lights information to the shader for each point light
-                    for(int i = 0; i < lightingInformation.numberOfPointLights; i++){
-                        //get the point light
-                        PointLight* currentPointLight = &lightingInformation.pointLights[i];
-                        //set the parameters of the shader
-                        gouraudTexShader.setVec3(std::string("pointLights[") + std::to_string(i) +
-                            std::string("].position"), currentPointLight->position);
-                        gouraudTexShader.setFloat(std::string("pointLights[") + std::to_string(i) +
-                            std::string("].constant"), currentPointLight->constant);
-                        gouraudTexShader.setFloat(std::string("pointLights[") + std::to_string(i) +
-                            std::string("].linear"), currentPointLight->linear);
-                        gouraudTexShader.setFloat(std::string("pointLights[") + std::to_string(i) +
-                            std::string("].quadratic"), currentPointLight->quadratic);
-                        gouraudTexShader.setVec3(std::string("pointLights[") + std::to_string(i) +
-                            std::string("].ambient"), currentPointLight->ambient);
-                        gouraudTexShader.setVec3(std::string("pointLights[") + std::to_string(i) +
-                            std::string("].diffuse"), currentPointLight->diffuse);
-                        gouraudTexShader.setVec3(std::string("pointLights[") + std::to_string(i) +
-                            std::string("].specular"), currentPointLight->specular);
-                    }
-
-                    //translate the current model to the side of the previous model
-                    ml::matrix<float> modelMatrix(4, 4, true);
-                    //tmp is the array used to translate the model using its assigned delta value
-                    float tmp[3] = {delta[i], 0, 0};
-                    modelMatrix = utils::translate(modelMatrix, tmp);
-
-                    // apply rotation
-                    modelMatrix = utils::rotateX(modelMatrix, modelCoordVector[i].rotation[0]);
-                    modelMatrix = utils::rotateY(modelMatrix, modelCoordVector[i].rotation[1]);
-                    modelMatrix = utils::rotateZ(modelMatrix, modelCoordVector[i].rotation[2]);
-
-                    // apply scale
-                    modelMatrix = utils::scale(modelMatrix, modelCoordVector[i].scale);
-
-                    // apply translation to the origin
-                    modelMatrix = utils::translate(modelMatrix, modelCoordVector[i].position);
-
-
-                    //transpose the matrix
-                    modelMatrix = modelMatrix.transpose();
-
-                    //pass the model matrix to the shader
-                    gouraudTexShader.setMat4("model", modelMatrix.getMatrix());
-                    model.Draw(gouraudTexShader);
-
-                    i++;
-                }
-
-
-
 
                 //---------//
                 //DRAW CUBE//
@@ -567,6 +575,7 @@ namespace graphicslib {
 
 
 
+#endif
 
             //-----------------//
             //DRAW POINT LIGHTS//
@@ -591,8 +600,16 @@ namespace graphicslib {
             glfwPollEvents();
         }
 
+        //delete the allocated models
+        for(auto modelInfo: mModelInformationVector){
+            if(modelInfo.model){
+                delete modelInfo.model;
+            }
+        }
+
     }
 
+#ifdef SHOW_CUBE
     // set up vertex data (and buffer(s)) and configure vertex attributes from the cube
     unsigned int Window::loadCubeVAO(){
 
@@ -616,6 +633,7 @@ namespace graphicslib {
 
         return cubeVAO;
     }
+#endif
 
     //gen and setup a VAO to the point lights and fill it's buffer
     unsigned int Window::loadPointLightsVAO(){

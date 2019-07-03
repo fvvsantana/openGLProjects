@@ -53,6 +53,7 @@ public:
 
     // find the size of the biggest dimension of the bounding box
     float biggestDimensionSize();
+    int getNumberOfTexturesLoaded();
 
 private:
     /*  Functions   */

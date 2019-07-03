@@ -17,14 +17,11 @@ struct PointLight {
 
 in vec3 FragPos;
 in vec3 Normal;
-in vec2 TexCoords;
 
 uniform vec3 viewPos;
 uniform PointLight pointLights[MAX_POINT_LIGHT_NUMBER];
 uniform int numberOfPointLights;
 
-uniform sampler2D texture_diffuse1;
-uniform sampler2D texture_specular1;
 uniform float shininess; //ns
 
 // function prototypes
@@ -72,12 +69,12 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir, f
     float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));    
     // combine results
 
-    vec3 diffuseTexture = vec3(texture(texture_diffuse1, TexCoords));
-    vec3 specularTexture = vec3(texture(texture_specular1, TexCoords));
 
-    vec3 ambient = ka * light.ambient * diffuseTexture;
-    vec3 diffuse = kd * light.diffuse * diff * diffuseTexture;
-    vec3 specular = ks * light.specular * spec * specularTexture;
+    vec3 color = vec3(1.0, 0.5, 0.31);
+
+    vec3 ambient = ka * light.ambient * color;
+    vec3 diffuse = kd * light.diffuse * diff * color;
+    vec3 specular = ks * light.specular * spec * color;
 
     return (ambient + diffuse + specular) * attenuation;
 }

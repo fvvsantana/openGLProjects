@@ -299,3 +299,7 @@ Dimension Model::zLimits()
 
     return z;
 }
+
+int Model::getNumberOfTexturesLoaded(){
+    return textures_loaded.size();
+}

@@ -9,6 +9,9 @@
 #define MAX_LIGHT_NUMBER 100
 
 
+class Shader;
+class Model;
+
 namespace ml{
     template<class T>
         class matrix;
@@ -21,7 +24,14 @@ namespace graphicslib {
         float texcoord[2];
     };
 
-    struct ModelCoordinates{
+    struct ModelInformation{
+        //model
+        Model* model;
+        //its shaders
+        Shader* phongShader;
+        Shader* gouraudShader;
+
+        //its coordinates
         float position[3];
         float rotation[3];
         float scale[3];
@@ -64,11 +74,16 @@ namespace graphicslib {
         int numberOfPointLights;
     };
 
+
     //responds to mouse movements via callback (argument to glfw)
     void mouseCallback(GLFWwindow* window, double xpos, double ypos);
 
     class Window {
     private:
+
+//#define SHOW_CUBE
+#ifdef SHOW_CUBE
+
         //Temporary cube just to see the shader effects clearly
         float cubeVertices[216] = {
         -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
@@ -113,15 +128,13 @@ namespace graphicslib {
         -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
         -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
         };
+#endif
 
         int mWindowWidth;
         int mWindowHeight;
         GLFWwindow* mWindow;
         GLuint mCoreProgram;
 
-        ModelCoordinates modelCoord;
-        //vector used to store the initial position of multiple models
-        std::vector<ModelCoordinates> modelCoordVector;
 
         // perspective type
         bool mPhong;
@@ -133,6 +146,8 @@ namespace graphicslib {
 
         //struct to keep all the lighting information
         LightingInformation lightingInformation;
+        //struct to keep all the model information
+        std::vector<ModelInformation> mModelInformationVector;
 
         unsigned int loadCubeVAO();
         unsigned int loadPointLightsVAO();
