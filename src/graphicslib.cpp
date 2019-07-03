@@ -135,17 +135,9 @@ namespace graphicslib {
         std::string line;
         
 
-        // structures that will be used to read objects and display them on the screen
-        // --------------------------------------------------------------------------------------------
+
+
         int i = 0;
-        
-        //delta is the distance between the origin of the coordinate system and the center of the i model
-        std::vector<float> delta;
-        delta.push_back(0);
-
-        // -------------------------------------------------------------------------------------------
-
-
         //initialize the number of lights
         lightingInformation.numberOfPointLights = 0;
         //read a line of the file
@@ -250,9 +242,14 @@ namespace graphicslib {
                 currentModelInfo.scale[2] = 2.f/size;
 
                 // translate object to position "finalPos"
-                currentModelInfo.position[0] = finalPos.x - model.boundingBox.x.center;
-                currentModelInfo.position[1] = finalPos.y - model.boundingBox.y.center;
-                currentModelInfo.position[2] = finalPos.z - model.boundingBox.z.center;
+                currentModelInfo.position[0] = - model.boundingBox.x.center;
+                currentModelInfo.position[1] = - model.boundingBox.y.center;
+                currentModelInfo.position[2] = - model.boundingBox.z.center;
+
+                currentModelInfo.finalPosition[0] = finalPos.x;
+                currentModelInfo.finalPosition[1] = finalPos.y;
+                currentModelInfo.finalPosition[2] = finalPos.z;
+
 
               
                 i++;
@@ -442,9 +439,9 @@ namespace graphicslib {
 
                 //translate the current model to the side of the previous model
                 ml::matrix<float> modelMatrix(4, 4, true);
-                //tmp is the array used to translate the model using its assigned delta value
-                float tmp[3] = {delta[i], 0, 0};
-                modelMatrix = utils::translate(modelMatrix, tmp);
+
+                //translate the object to the final position
+                modelMatrix = utils::translate(modelMatrix, modelInfo.finalPosition);
 
                 // apply rotation
                 modelMatrix = utils::rotateX(modelMatrix, modelInfo.rotation[0]);
