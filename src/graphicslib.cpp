@@ -241,11 +241,12 @@ namespace graphicslib {
                 currentModelInfo.scale[1] = 2.f/size;
                 currentModelInfo.scale[2] = 2.f/size;
 
-                // translate object to position "finalPos"
-                currentModelInfo.position[0] = - model.boundingBox.x.center;
-                currentModelInfo.position[1] = - model.boundingBox.y.center;
-                currentModelInfo.position[2] = - model.boundingBox.z.center;
+                // translate object to origin
+                currentModelInfo.position[0] = -model.boundingBox.x.center;
+                currentModelInfo.position[1] = -model.boundingBox.y.center;
+                currentModelInfo.position[2] = -model.boundingBox.z.center;
 
+                // translate object to position "finalPos"
                 currentModelInfo.finalPosition[0] = finalPos.x;
                 currentModelInfo.finalPosition[1] = finalPos.y;
                 currentModelInfo.finalPosition[2] = finalPos.z;
@@ -433,7 +434,6 @@ namespace graphicslib {
                     std::string("].specular"), currentPointLight->specular);
                 }
 
-                //translate the current model to the side of the previous model
                 ml::matrix<float> modelMatrix(4, 4, true);
 
                 //translate the object to the final position
@@ -449,7 +449,6 @@ namespace graphicslib {
 
                 // apply translation to the origin
                 modelMatrix = utils::translate(modelMatrix, modelInfo.position);
-
 
                 //transpose the matrix
                 modelMatrix = modelMatrix.transpose();
