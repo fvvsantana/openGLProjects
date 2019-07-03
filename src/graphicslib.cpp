@@ -223,8 +223,6 @@ namespace graphicslib {
                 }
 
 
-                //set model coordinates
-
                 // calculate the bounding box of the model
                 model.calcBoundingBox();
 
@@ -250,19 +248,15 @@ namespace graphicslib {
                 currentModelInfo.finalPosition[1] = finalPos.y;
                 currentModelInfo.finalPosition[2] = finalPos.z;
 
-
-              
                 i++;
 
                 //finally append the current information to the vector
                 mModelInformationVector.push_back(currentModelInfo);
 
-
             }
 
         }
         sceneFile.close();
-
 
 
 

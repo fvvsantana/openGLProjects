@@ -6,8 +6,8 @@ Camera::Camera(glm::vec3 position, glm::vec3 up, glm::vec3 lookAt)
 {
     Position = position;
     WorldUp = up;
-    Yaw = glm::atan(lookAt.x - position.x, position.z - lookAt.z) - glm::radians(90.f);
-    Pitch = glm::atan((lookAt.y - position.y)/(position.z - lookAt.z));
+    Yaw = glm::degrees(glm::atan(lookAt.x - position.x, position.z - lookAt.z)) - 90.f;
+    Pitch = glm::degrees(glm::atan((lookAt.y - position.y)/(position.z - lookAt.z)));
     updateCameraVectors();
 }
 
@@ -93,9 +93,9 @@ void Camera::updateCameraVectors()
 {
     // Calculate the new Front vector
     glm::vec3 front;
-    front.x = cos(Yaw) * cos(Pitch);
-    front.y = sin(Pitch);
-    front.z = sin(Yaw) * cos(Pitch);
+    front.x = cos(glm::radians(Yaw)) * cos(glm::radians(Pitch));
+    front.y = sin(glm::radians(Pitch));
+    front.z = sin(glm::radians(Yaw)) * cos(glm::radians(Pitch));
     Front = glm::normalize(front);
     // Also re-calculate the Right and Up vector
     // Normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
