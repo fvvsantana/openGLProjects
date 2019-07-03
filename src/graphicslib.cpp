@@ -138,9 +138,6 @@ namespace graphicslib {
         delta.push_back(0);
 
         std::vector<Model> models;
-        //previousModelSize is the half the x-axis size of the model on the left of the current model
-        //it is used to obtain the delta value for the current model
-        float previousModelSize = 0;
         // -------------------------------------------------------------------------------------------
 
 
@@ -205,8 +202,8 @@ namespace graphicslib {
             // if it's defining a object
             else if(firstWord == "object"){
                 std::string path;
-                glm::vec3 center;
-                lineStream >> path >> center.x >> center.y >> center.z;
+                glm::vec3 finalPos;
+                lineStream >> path >> finalPos.x >> finalPos.y >> finalPos.z;
 
                 Model model(path);
 
@@ -226,16 +223,11 @@ namespace graphicslib {
                 modelCoord.scale[1] = 2.f/size;
                 modelCoord.scale[2] = 2.f/size;
 
-                modelCoord.position[0] = -(model.boundingBox.x.center);
-                modelCoord.position[1] = -(model.boundingBox.y.center);
-                modelCoord.position[2] = -(model.boundingBox.z.center);
+                // translate object to position "finalPos"
+                modelCoord.position[0] = finalPos.x - model.boundingBox.x.center;
+                modelCoord.position[1] = finalPos.y - model.boundingBox.y.center;
+                modelCoord.position[2] = finalPos.z - model.boundingBox.z.center;
 
-                //to set the delta distance, we need the delta of the previous model, half of its size, half of the
-                //size of the current model and a constant value (so the models won't be rendered too close to each other)
-                if(i != 0) {
-                    delta.push_back(delta[i - 1] + previousModelSize + modelCoord.scale[0]*model.boundingBox.x.size/2 + 0.25);
-                }
-                previousModelSize = modelCoord.scale[0]*model.boundingBox.x.size/2;
 
                 i++;
                 modelCoordVector.push_back(modelCoord);
