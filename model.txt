@@ -1,4 +1,0 @@
-resources/objects/cyborg/cyborg.obj
-resources/objects/rock/rock.obj
-resources/objects/planet/planet.obj
-resources/objects/nanosuit/nanosuit.obj
