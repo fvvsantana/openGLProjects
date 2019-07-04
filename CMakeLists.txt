@@ -1,11 +1,12 @@
 cmake_minimum_required (VERSION 2.8)
 
 #extract the current directory name and replace the whitespaces by underscores: 
-get_filename_component(ProjectId ${CMAKE_CURRENT_SOURCE_DIR} NAME)
-string(REPLACE " " "_" ProjectId ${ProjectId})
+#get_filename_component(ProjectId ${CMAKE_CURRENT_SOURCE_DIR} NAME)
+#string(REPLACE " " "_" ProjectId ${ProjectId})
 
 #----------------------------
 #project name:
+set(ProjectId opengl3DObject)
 project(${ProjectId})
 
 set(CMAKE_CXX_FLAGS "-g -Wall -std=c++17")
