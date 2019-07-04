@@ -25,7 +25,7 @@ Para executar o projeto siga as instruções:
 
 Baixe o repositório.
 
-Crie um arquivo 'scene.txt' na raiz do projeto com cada modelo a ser carregado na aplicação em uma linha.
+Crie um arquivo 'scene.txt' na raiz do projeto com cada objeto, fonte de luz e a câmera a ser carregado na aplicação em uma linha diferente.
 
 Crie e acesse a pasta build na raiz do projeto:
 ```
