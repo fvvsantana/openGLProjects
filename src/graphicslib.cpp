@@ -155,6 +155,10 @@ namespace graphicslib {
             std::istringstream lineStream(line);
             lineStream >> firstWord;
 
+            //---------------------//
+            //READ LIGHTS FROM FILE//
+            //---------------------//
+
             //if it's adding a light in the scene
             if(firstWord == "light"){
                 //get the point light to alter
@@ -206,6 +210,10 @@ namespace graphicslib {
                 //add a reference to it just to ease the coding
                 Model &model = *(currentModelInfo.model);
 
+
+                //----------------//
+                //SHADER SELECTION//
+                //----------------//
 
                 //check if the model has textures
                 if(model.getNumberOfTexturesLoaded()){
@@ -395,6 +403,10 @@ namespace graphicslib {
             for(auto modelInfo : mModelInformationVector){
 
                 Shader* currentShader;
+
+                //-----------------//
+                //SHADING SELECTION//
+                //-----------------//
 
                 if(mPhong){
                     currentShader = modelInfo.phongShader;

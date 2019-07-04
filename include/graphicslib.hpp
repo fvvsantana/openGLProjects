@@ -149,6 +149,11 @@ namespace graphicslib {
 
         //struct to keep all the lighting information
         LightingInformation lightingInformation;
+
+        //------------------------//
+        //MODEL INFORMATION VECTOR//
+        //------------------------//
+
         //struct to keep all the model information
         std::vector<ModelInformation> mModelInformationVector;
 
