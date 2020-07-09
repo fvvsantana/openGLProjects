@@ -19,6 +19,8 @@ Para outras distribuições, instale a partir do código fonte:
 	sudo make install
 ```
 
+![](w4.gif)
+
 ## Executando o projeto
 
 Para executar o projeto siga as instruções:
