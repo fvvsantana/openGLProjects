@@ -1,7 +1,7 @@
 # OpenGL Projects
 
 ## Description
-Here are four projects that we made during the Computer Graphics course in the university. All the geometric calculations (including rotations, projection, lighting techniques, camera movement) were implemented from scratch using analytic geometry and linear algebra. We didn't use frameworks, that was made with "vanilla" OpenGL and a few libraries.
+Here are four projects that we made during the Computer Graphics course in the university. All the geometric calculations (including rotations, projection, shading techniques, camera movement) were implemented from scratch using analytic geometry and linear algebra. We didn't use frameworks, that was made with "vanilla" OpenGL and a few libraries.
 
 The projects are:
 * Work 1: basic wind mill with colors and 2D rotation.
