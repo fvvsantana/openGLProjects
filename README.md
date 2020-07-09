@@ -61,18 +61,3 @@ Compile and execute:
 ```
     make run
 ```
-
-The only project that cannot be executed this way is the Work 2, because for this project, you can choose the 3D object you want to load. For this one, you do the following:
-```
-    mkdir build && cd build
-    cmake ..
-    make all
-```
-Go to the root directory:
-```
-	cd ..
-```
-And then run the executable passing the path to the .obj file:
-```
-	./opengl3DObject resources/objects/nanosuit/nanosuit.obj
-```
