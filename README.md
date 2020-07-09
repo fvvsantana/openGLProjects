@@ -5,12 +5,19 @@ Here are four projects that we made during the Computer Graphics course in the u
 
 The projects are:
 * Work 1: basic wind mill with colors and 2D rotation.
+
 ![](w1.gif)
+
 * Work 2: loading 3D objects and applying rotations to it.
+
 ![](w2.gif)
+
 * Work 3: orthographic and perspective projection.
+
 ![](w3.gif)
+
 * Work 4: apply lighting using Gouraud and Phong shading techniques.
+
 ![](w4.gif)
 
 You can download the versions in the Releases tab.
