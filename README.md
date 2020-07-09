@@ -31,7 +31,7 @@ You can download the versions in the Releases tab.
 * cmake
 * make
 * g++ com suporte a C++ 17
-* assimp (for loading 3D object)
+* assimp (for loading 3D object file)
 
 ### Installing Assimp
 
