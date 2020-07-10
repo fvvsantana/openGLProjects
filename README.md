@@ -30,7 +30,7 @@ You can download the versions in the Releases tab.
 ## Prerequisites
 * cmake
 * make
-* g++ com suporte a C++ 17
+* g++
 * assimp (for loading 3D object file)
 
 ### Installing Assimp
